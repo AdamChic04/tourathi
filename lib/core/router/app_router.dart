@@ -5,6 +5,7 @@ import '../../features/splash/splash_screen.dart';
 import '../../features/shell/main_shell.dart';
 import '../../features/place_details/place_details_screen.dart';
 import '../../features/coming_soon/coming_soon_screen.dart';
+import '../../features/ai_planner/ai_planner_screen.dart';
 
 class AppRouter {
   AppRouter._();
@@ -38,8 +39,7 @@ class AppRouter {
       ),
       GoRoute(
         path: '/ai-planner',
-        builder: (context, state) =>
-            const ComingSoonScreen(feature: 'AI Trip Planner'),
+        builder: (context, state) => const AiPlannerScreen(),
       ),
       GoRoute(
         path: '/ar-hub',
