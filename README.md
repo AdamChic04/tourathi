@@ -1,47 +1,41 @@
-# TouRathi — Jordan Tourism Flutter App
+# TouRathi — Flutter UI milestone
 
-TouRathi is a student-built Flutter application showcasing tourism in Jordan. This repository contains the **Flutter app code** for the current graduation-project prototype.
+This repository contains **only the TouRathi screens developed so far**, not the unfinished screens supplied by the original demo project.
 
-## Current milestone
+## Implemented
 
-- ✅ Animated splash screen: centered compass emblem, gold ring, wordmark, automatic transition to Home.
-- ✅ Redesigned Home screen: minimal layout with an offline four-destination carousel (Petra, Jerash, Wadi Rum, Dead Sea), autoplay, swipe, page indicators, destination cards, and two shortcuts.
-- 🧪 Existing app screens are included from the original starter project as prototypes; they are **not all production-ready**.
-- ⏸️ Explore Jordan redesign is on hold pending a new design and the tourism dataset.
-- ⏳ Supabase backend, real AI APIs, online maps, and production AR are future integrations; they **are not implemented in this snapshot**.
+- Animated centered TouRathi splash / compass symbol, then automatic Home transition.
+- Clean Home screen with four automatically sliding destination visuals, search shortcut, destination cards and favorites.
+- Redesigned Explore Jordan screen with search, categories, sorting, favorites, and an illustrative (non-live) map overview.
+- Simple destination-details screen and working Home / Explore navigation.
+- English and Arabic labels, light / dark theme foundations.
 
-## Run locally
+All four bundled destination images are **AI-generated illustrative demo images**, not actual photographs of the sites. Place ratings and descriptions are sample content. Favorites currently last only while the app is running.
 
-1. Install the [Flutter SDK](https://docs.flutter.dev/get-started/install) (matching Dart SDK >= 3.7.2) and an emulator or Chrome.
-2. Open this folder in VS Code or Android Studio.
-3. Run:
+## Not implemented yet
+
+Supabase authentication and database, AI Trip Planner, AI image/video generator, AR, maps/navigation, marketplace, group chat, profiles and bookings. Visible shortcut buttons for upcoming features lead to an explicit **Coming soon** screen.
+
+## Run
+
+Install the Flutter SDK, then from the repository root:
 
 ```bash
 flutter pub get
 flutter run -d chrome
 ```
 
-For Android / iOS devices, use `flutter run` and pick a device. The app launches into the animated splash and proceeds to Home.
+The app starts on the animated splash and then enters the Home screen.
 
-## Project layout
+## Project structure
 
-- `lib/features/splash/splash_screen.dart` — animated app opening
-- `lib/features/home/home_screen.dart` — Home and photo slider
-- `lib/features/shell/main_shell.dart` — bottom navigation
-- `lib/core/router/app_router.dart` — application routes
-- `lib/data/mock/` — temporary sample data
-- `assets/images/home/` — four bundled demonstration images
+- `lib/features/splash/`: opening animation
+- `lib/features/home/`: Home
+- `lib/features/explore/`: Explore Jordan
+- `lib/features/place_details/`: destination preview
+- `lib/features/coming_soon/`: honest placeholders
+- `lib/core/`: routing, theme and session state
+- `lib/data/`: small sample destination model and records
+- `assets/images/home/`: four locally bundled illustrative destination visuals
 
-## Images
-
-The four bundled destination images are **AI-generated illustrative placeholders** rather than photos of the actual sites. Replace them with properly licensed authentic photographs before publishing or presenting them as documentary images. Keeping the filenames allows the current Home code to continue working.
-
-## Planned stack
-
-Flutter/Dart frontend; Supabase PostgreSQL / Auth / Storage / Realtime; potential Node.js + Express server layer; third-party AI services and maps. **No backend API credentials belong in this repository.**
-
-## Notes
-
-- This is a prototype and has not been compiled or tested in a Flutter emulator in the preparation environment.
-- Do not commit `.env`, API keys, service-role keys, or credentials.
-- `README_SPLASH_ANIMATION.md` and `README_HOME_CAROUSEL.md` contain more detailed notes.
+**Milestone:** Frontend UI foundation only. Flutter build and device testing should be performed on the developer's computer.
