@@ -3,15 +3,8 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
 import '../../core/providers/app_provider.dart';
-import '../../data/mock/mock_data.dart';
+import '../../data/mock/jordan_place_seed.dart';
 import '../../data/models/models.dart';
-
-const _photos = <String, String>{
-  'petra': 'assets/images/home/petra.jpg',
-  'jerash': 'assets/images/home/jerash.jpg',
-  'wadi-rum': 'assets/images/home/wadi_rum.jpg',
-  'dead-sea': 'assets/images/home/dead_sea.jpg',
-};
 
 class PlaceDetailsScreen extends StatelessWidget {
   const PlaceDetailsScreen({super.key, required this.placeId});
@@ -20,7 +13,7 @@ class PlaceDetailsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     Place? place;
-    for (final candidate in MockData.popularPlaces) {
+    for (final candidate in JordanPlaceSeed.places) {
       if (candidate.id == placeId) {
         place = candidate;
         break;
@@ -38,7 +31,7 @@ class PlaceDetailsScreen extends StatelessWidget {
     final arabic = provider.isArabic;
     final dark = Theme.of(context).brightness == Brightness.dark;
     final accent = dark ? const Color(0xFFD9A67D) : const Color(0xFF9B6548);
-    final image = _photos[p.id];
+    final image = p.imageUrl;
 
     return Scaffold(
       appBar: AppBar(
@@ -61,7 +54,7 @@ class PlaceDetailsScreen extends StatelessWidget {
       ),
       body: ListView(
         children: [
-          if (image != null)
+          if (image.isNotEmpty)
             AspectRatio(
               aspectRatio: 1.3,
               child: Image.asset(image, fit: BoxFit.cover),

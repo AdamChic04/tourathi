@@ -3,7 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
 import '../../core/providers/app_provider.dart';
-import '../../data/mock/mock_data.dart';
+import '../../data/mock/jordan_place_seed.dart';
 import '../../data/models/models.dart';
 
 /// Explore Jordan — a deliberately simple, photo-led discovery screen.
@@ -11,13 +11,6 @@ import '../../data/models/models.dart';
 /// This version uses four *sample* destinations and bundled offline image
 /// illustrations. When the places dataset arrives, replace the data source in
 /// [_places] and the asset mapping without changing this view's layout.
-const Map<String, String> _localImages = {
-  'petra': 'assets/images/home/petra.jpg',
-  'jerash': 'assets/images/home/jerash.jpg',
-  'wadi-rum': 'assets/images/home/wadi_rum.jpg',
-  'dead-sea': 'assets/images/home/dead_sea.jpg',
-};
-
 const _categoryKeys = ['all', 'heritage', 'adventure', 'nature'];
 
 enum _ExploreSort { featured, name }
@@ -37,18 +30,18 @@ class _ExploreScreenState extends State<ExploreScreen> {
   _ExploreSort _sort = _ExploreSort.featured;
   _ExploreView _view = _ExploreView.grid;
 
-  List<Place> get _places => MockData.popularPlaces
-      .where((place) => _localImages.containsKey(place.id))
-      .toList(growable: false);
+  List<Place> get _places => JordanPlaceSeed.places;
 
-  String _categoryOf(String id) {
-    switch (id) {
-      case 'petra':
-      case 'jerash':
+  String _categoryOf(Place place) {
+    switch (place.category) {
+      case 'heritage':
+      case 'museums':
+      case 'religious':
+      case 'food':
         return 'heritage';
-      case 'wadi-rum':
+      case 'adventure':
         return 'adventure';
-      case 'dead-sea':
+      case 'hiking':
         return 'nature';
       default:
         return 'all';
@@ -59,7 +52,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
     final text = _searchController.text.trim().toLowerCase();
     final results = source.where((place) {
       final categoryMatch = _category == 'all' ||
-          _categoryOf(place.id) == _category;
+          _categoryOf(place) == _category;
       final savedMatch = !_savedOnly || provider.isFavorite(place.id);
       final queryMatch = text.isEmpty ||
           [
@@ -371,8 +364,8 @@ class _ExploreScreenState extends State<ExploreScreen> {
                       return _ExplorePlaceCard(
                         key: Key('explore_place_${place.id}'),
                         place: place,
-                        photo: _localImages[place.id]!,
-                        category: _categoryLabel(_categoryOf(place.id), ar),
+                        photo: place.imageUrl,
+                        category: _categoryLabel(_categoryOf(place), ar),
                         palette: palette,
                         isArabic: ar,
                         saved: provider.isFavorite(place.id),

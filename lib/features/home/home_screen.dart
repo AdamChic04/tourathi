@@ -5,17 +5,16 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
 import '../../core/providers/app_provider.dart';
-import '../../data/mock/mock_data.dart';
+import '../../data/mock/jordan_place_seed.dart';
 import '../../data/models/models.dart';
 
 /// TouRathi — streamlined Home screen.
-/// All four assets are bundled in pubspec.yaml and work offline.
-/// These are AI-generated demo illustrations, not verified site photographs.
+/// Featured destinations use their bundled, attributed location photographs.
 const Map<String, String> _photos = {
-  'petra': 'assets/images/home/petra.jpg',
-  'jerash': 'assets/images/home/jerash.jpg',
-  'wadi-rum': 'assets/images/home/wadi_rum.jpg',
-  'dead-sea': 'assets/images/home/dead_sea.jpg',
+  'maan-petra': 'assets/images/places/maan-petra.jpg',
+  'jerash-roman-city': 'assets/images/places/jerash-roman-city.jpg',
+  'maan-wadi-rum': 'assets/images/places/maan-wadi-rum.jpg',
+  'tafilah-dana': 'assets/images/places/tafilah-dana.jpg',
 };
 
 class HomeScreen extends StatefulWidget {
@@ -33,7 +32,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Timer? _slideTimer;
   int _slide = 0;
 
-  List<Place> get _places => MockData.popularPlaces
+  List<Place> get _places => JordanPlaceSeed.places
       .where((place) => _photos.containsKey(place.id))
       .toList(growable: false);
 

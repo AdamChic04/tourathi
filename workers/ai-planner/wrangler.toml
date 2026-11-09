@@ -1,0 +1,19 @@
+name = "tourathi-ai-planner"
+main = "src/index.ts"
+compatibility_date = "2026-11-07"
+
+[ai]
+binding = "AI"
+
+[vars]
+# Replace this with the exact HTTPS origin used by the deployed web app.
+# Native Android/iOS requests do not send an Origin header.
+ALLOWED_ORIGINS = "https://YOUR-WEB-APP-ORIGIN"
+
+[[ratelimits]]
+name = "PLANNER_LIMITER"
+namespace_id = "837461029"
+
+[ratelimits.simple]
+limit = 8
+period = 60

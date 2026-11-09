@@ -52,7 +52,11 @@ class PlannedVisit {
 }
 
 class DemoPlan {
-  const DemoPlan({required this.visits, required this.totalFils, required this.warnings});
+  const DemoPlan({
+    required this.visits,
+    required this.totalFils,
+    required this.warnings,
+  });
   final List<PlannedVisit> visits;
   final int totalFils;
   final List<String> warnings;
@@ -60,21 +64,84 @@ class DemoPlan {
 }
 
 const demoDestinations = <DemoDestination>[
-  DemoDestination(id: 'petra', name: 'Petra', city: 'Ma’an', category: 'heritage', discovery: DiscoveryPreference.famous, costFils: null, visitMinutes: 240, walkingKm: null, source: 'Demo fixture; verify current fees, hours and accessibility'),
-  DemoDestination(id: 'jerash', name: 'Jerash Archaeological City', city: 'Jerash', category: 'heritage', discovery: DiscoveryPreference.famous, costFils: null, visitMinutes: 180, walkingKm: null, source: 'Demo fixture; verify current fees, hours and accessibility'),
-  DemoDestination(id: 'salt-walk', name: 'As-Salt heritage walk', city: 'Balqa', category: 'culture', discovery: DiscoveryPreference.local, costFils: null, visitMinutes: 120, walkingKm: null, source: 'Demo fixture; verify with local organizer'),
-  DemoDestination(id: 'madaba-crafts', name: 'Madaba craft experience', city: 'Madaba', category: 'culture', discovery: DiscoveryPreference.local, costFils: null, visitMinutes: 90, walkingKm: null, source: 'Demo fixture; verify availability with host'),
-  DemoDestination(id: 'wadi-rum', name: 'Wadi Rum', city: 'Aqaba', category: 'nature', discovery: DiscoveryPreference.mixed, costFils: null, visitMinutes: 240, walkingKm: null, source: 'Demo fixture; requires verified operator and booking'),
+  DemoDestination(
+    id: 'petra',
+    name: 'Petra',
+    city: 'Ma’an',
+    category: 'heritage',
+    discovery: DiscoveryPreference.famous,
+    costFils: null,
+    visitMinutes: 240,
+    walkingKm: null,
+    source: 'Demo fixture; verify current fees, hours and accessibility',
+  ),
+  DemoDestination(
+    id: 'jerash',
+    name: 'Jerash Archaeological City',
+    city: 'Jerash',
+    category: 'heritage',
+    discovery: DiscoveryPreference.famous,
+    costFils: null,
+    visitMinutes: 180,
+    walkingKm: null,
+    source: 'Demo fixture; verify current fees, hours and accessibility',
+  ),
+  DemoDestination(
+    id: 'salt-walk',
+    name: 'As-Salt heritage walk',
+    city: 'Balqa',
+    category: 'culture',
+    discovery: DiscoveryPreference.local,
+    costFils: null,
+    visitMinutes: 120,
+    walkingKm: null,
+    source: 'Demo fixture; verify with local organizer',
+  ),
+  DemoDestination(
+    id: 'madaba-crafts',
+    name: 'Madaba craft experience',
+    city: 'Madaba',
+    category: 'culture',
+    discovery: DiscoveryPreference.local,
+    costFils: null,
+    visitMinutes: 90,
+    walkingKm: null,
+    source: 'Demo fixture; verify availability with host',
+  ),
+  DemoDestination(
+    id: 'wadi-rum',
+    name: 'Wadi Rum',
+    city: 'Aqaba',
+    category: 'nature',
+    discovery: DiscoveryPreference.mixed,
+    costFils: null,
+    visitMinutes: 240,
+    walkingKm: null,
+    source: 'Demo fixture; requires verified operator and booking',
+  ),
 ];
 
-DemoPlan buildDemoPlan(TripPreferences preferences, {List<DemoDestination> candidates = demoDestinations}) {
+DemoPlan buildDemoPlan(
+  TripPreferences preferences, {
+  List<DemoDestination> candidates = demoDestinations,
+}) {
   if (preferences.days < 1 || preferences.days > 30) {
-    return const DemoPlan(visits: [], totalFils: 0, warnings: ['Trip length must be between 1 and 30 days.']);
+    return const DemoPlan(
+      visits: [],
+      totalFils: 0,
+      warnings: ['Trip length must be between 1 and 30 days.'],
+    );
   }
-  final pool = candidates.where((place) =>
-    (preferences.interests.isEmpty || preferences.interests.contains(place.category)) &&
-    (place.walkingKm == null || place.walkingKm! <= preferences.maxWalkingKm)
-  ).toList();
+  final pool =
+      candidates
+          .where(
+            (place) =>
+                (preferences.interests.isEmpty ||
+                    preferences.interests.contains(place.category)) &&
+                (place.walkingKm == null ||
+                    place.walkingKm! <= preferences.maxWalkingKm),
+          )
+          .toList();
   pool.sort((a, b) {
     final ap = a.discovery == preferences.discovery ? 1 : 0;
     final bp = b.discovery == preferences.discovery ? 1 : 0;
@@ -86,15 +153,26 @@ DemoPlan buildDemoPlan(TripPreferences preferences, {List<DemoDestination> candi
     // Unknown prices are never treated as free and cannot pass a hard budget.
     if (place.costFils == null) continue;
     if (total + place.costFils! > preferences.budgetFils) continue;
-    visits.add(PlannedVisit(place, 'Matches your selected interests and discovery preference.'));
+    visits.add(
+      PlannedVisit(
+        place,
+        'Matches your selected interests and discovery preference.',
+      ),
+    );
     total += place.costFils!;
     if (visits.length >= preferences.days * 3) break;
   }
   final warnings = <String>[
     'DEMO DATA: no verified live opening hours, prices, routes, availability, or accessibility information.',
-    if (visits.isEmpty) 'No destinations with known demo prices fit the selected preferences and budget.',
-    if (preferences.avoidCrowds) 'Crowd levels are unknown; no quiet-place guarantee is made.',
+    if (visits.isEmpty)
+      'No destinations with known demo prices fit the selected preferences and budget.',
+    if (preferences.avoidCrowds)
+      'Crowd levels are unknown; no quiet-place guarantee is made.',
     'This prototype does not call OpenAI, Mapbox, or Firestore and is not a verified itinerary.',
   ];
-  return DemoPlan(visits: List.unmodifiable(visits), totalFils: total, warnings: List.unmodifiable(warnings));
+  return DemoPlan(
+    visits: List.unmodifiable(visits),
+    totalFils: total,
+    warnings: List.unmodifiable(warnings),
+  );
 }

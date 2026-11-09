@@ -10,6 +10,17 @@ class Place {
     required this.location,
     required this.locationAr,
     required this.rating,
+    this.imageUrl = '',
+    this.distance,
+    this.price,
+    this.category = 'heritage',
+    this.isFavorite = false,
+    this.historicalStory,
+    this.historicalStoryAr,
+    this.visitingHours,
+    this.entryFee,
+    this.reviewCount = 0,
+    this.discoveryTier = 'unknown',
   });
 
   final String id;
@@ -21,4 +32,15 @@ class Place {
   final String locationAr;
   /// Demo value, not a live visitor rating.
   final double rating;
+  final String imageUrl;
+  final String? distance;
+  final String? price;
+  final String category;
+  final bool isFavorite;
+  final String? historicalStory;
+  final String? historicalStoryAr;
+  final String? visitingHours;
+  final String? entryFee;
+  final int reviewCount;
+  final String discoveryTier;
 }
