@@ -1,7 +1,7 @@
 name: tourathi
-description: TouRathi - Jordan tourism Flutter UI milestone
+description: TouRathi - Jordan tourism Flutter app
 publish_to: 'none'
-version: 0.1.0+1
+version: 0.2.0+2
 
 environment:
   sdk: ^3.7.2
@@ -20,6 +20,7 @@ dependencies:
   shared_preferences: ^2.5.3
   http: ^1.6.0
   flutter_animate: ^4.5.2
+  supabase_flutter: ^2.15.4
 
 dev_dependencies:
   flutter_test:

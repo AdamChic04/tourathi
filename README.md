@@ -14,7 +14,7 @@ All four bundled destination images are **AI-generated illustrative demo images*
 
 ## Not implemented yet
 
-Supabase authentication and database, AI Trip Planner, AI image/video generator, AR, maps/navigation, marketplace, group chat, profiles and bookings. Visible shortcut buttons for upcoming features lead to an explicit **Coming soon** screen.
+Organizer/seller/admin portals, AI image/video generator, AR, full maps/navigation, marketplace, group chat, and bookings. Authentication and the secure user profile/role tables are now connected to Supabase. Visible shortcut buttons for upcoming features lead to an explicit **Coming soon** screen.
 
 ## Run
 
@@ -25,7 +25,7 @@ flutter pub get
 flutter run -d chrome
 ```
 
-The app starts on the animated splash and then enters the Home screen.
+The animated splash opens Login for signed-out visitors and Home for signed-in users. See [Authentication setup](README_AUTH.md) for email link configuration.
 
 ## Project structure
 
@@ -38,4 +38,4 @@ The app starts on the animated splash and then enters the Home screen.
 - `lib/data/`: small sample destination model and records
 - `assets/images/home/`: four locally bundled illustrative destination visuals
 
-**Milestone:** Frontend UI foundation only. Flutter build and device testing should be performed on the developer's computer.
+**Milestone:** Flutter UI plus Supabase email/password authentication. There is not yet a role-specific admin or organizer portal. Flutter build and device testing should be performed on the developer's computer.

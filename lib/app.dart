@@ -3,6 +3,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
+import 'core/auth/auth_router_refresh.dart';
 import 'core/providers/app_provider.dart';
 import 'core/router/app_router.dart';
 import 'core/theme/app_theme.dart';
@@ -16,13 +17,23 @@ class TouRathiApp extends StatefulWidget {
 
 class _TouRathiAppState extends State<TouRathiApp> {
   late final AppProvider _appProvider;
+  late final AuthRouterRefresh _authRefresh;
   late final GoRouter _router;
 
   @override
   void initState() {
     super.initState();
     _appProvider = AppProvider();
-    _router = AppRouter.router(_appProvider);
+    _authRefresh = AuthRouterRefresh();
+    _router = AppRouter.router(_authRefresh);
+  }
+
+  @override
+  void dispose() {
+    _router.dispose();
+    _authRefresh.dispose();
+    _appProvider.dispose();
+    super.dispose();
   }
 
   @override
@@ -38,10 +49,7 @@ class _TouRathiAppState extends State<TouRathiApp> {
             darkTheme: AppTheme.darkTheme(isArabic: app.isArabic),
             themeMode: app.themeMode,
             locale: app.locale,
-            supportedLocales: const [
-              Locale('en'),
-              Locale('ar'),
-            ],
+            supportedLocales: const [Locale('en'), Locale('ar')],
             localizationsDelegates: const [
               GlobalMaterialLocalizations.delegate,
               GlobalWidgetsLocalizations.delegate,
@@ -50,8 +58,7 @@ class _TouRathiAppState extends State<TouRathiApp> {
             routerConfig: _router,
             builder: (context, child) {
               return Directionality(
-                textDirection:
-                    app.isArabic ? TextDirection.rtl : TextDirection.ltr,
+                textDirection: app.isArabic ? TextDirection.rtl : TextDirection.ltr,
                 child: child ?? const SizedBox.shrink(),
               );
             },
