@@ -1,4 +1,5 @@
 import '../models/models.dart';
+import '../content/destination_guides.dart';
 
 /// Curated discovery seed for the prototype. These records intentionally omit
 /// unverified coordinates, opening hours, prices and accessibility claims.
@@ -12,8 +13,10 @@ class JordanPlaceSeed {
         id: id,
         name: en,
         nameAr: ar,
-        description: '$kind discovery record. Visit details require verification.',
-        descriptionAr: 'سجل استكشاف ($kind). يجب التحقق من تفاصيل الزيارة.',
+        description: DestinationGuides.forId(id)?.en ??
+            '$kind discovery record. Visit details require verification.',
+        descriptionAr: DestinationGuides.forId(id)?.ar ??
+            'سجل استكشاف ($kind). يجب التحقق من تفاصيل الزيارة.',
         location: '$governorate Governorate, Jordan',
         locationAr: 'محافظة $governorate، الأردن',
         imageUrl: 'assets/images/places/$id.jpg',
