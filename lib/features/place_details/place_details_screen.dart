@@ -8,6 +8,7 @@ import '../../data/content/destination_guides.dart';
 import '../../data/media/place_photo_credits.dart';
 import '../../data/mock/jordan_place_seed.dart';
 import '../../data/models/models.dart';
+import '../../data/repositories/place_visit_facts_repository.dart';
 import '../ai_planner/jordan_price_catalog.dart';
 import '../ai_planner/jordan_visit_info.dart';
 
@@ -46,6 +47,7 @@ class PlaceDetailsScreen extends StatelessWidget {
     final guide = DestinationGuides.forId(p.id);
     final visits = JordanVisitInfoCatalog.forPlace(p.id);
     final price = JordanPriceCatalog.forPlaceId(p.id);
+    final facts = PlaceVisitFactsRepository.forId(p.id);
     final name = ar ? p.nameAr : p.name;
     final location = ar ? p.locationAr : p.location;
     final text = ar
@@ -208,7 +210,30 @@ class PlaceDetailsScreen extends StatelessWidget {
                       _DetailPanel(
                         icon: Icons.schedule_outlined,
                         title: ar ? 'ساعات الزيارة' : 'Visiting hours',
-                        child: visits == null
+                        child: facts?.hoursTextEn != null
+                            ? Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(ar ? (facts!.hoursTextAr ?? facts.hoursTextEn!)
+                                          : facts!.hoursTextEn!,
+                                    style: const TextStyle(
+                                      fontSize: 15, fontWeight: FontWeight.w600,
+                                      height: 1.5,
+                                    )),
+                                  if (facts.hoursSourceUrl != null)
+                                    _ReferenceLink(
+                                      label: ar ? 'المصدر الرسمي للساعات' : 'Published hours source',
+                                      url: facts.hoursSourceUrl!,
+                                    ),
+                                  if (facts.hoursCheckedOn != null)
+                                    Text(
+                                      ar ? 'تاريخ التحقق: ${facts.hoursCheckedOn}' :
+                                           'Checked: ${facts.hoursCheckedOn}',
+                                      style: Theme.of(context).textTheme.bodySmall,
+                                    ),
+                                ],
+                              )
+                            : visits == null
                             ? Text(ar
                                 ? 'لم تُتحقق ساعات الزيارة بعد. تواصل مع الجهة المسؤولة قبل الذهاب.'
                                 : 'Hours have not been verified for this place. Check with the venue before visiting.')
@@ -236,7 +261,56 @@ class PlaceDetailsScreen extends StatelessWidget {
                       _DetailPanel(
                         icon: Icons.confirmation_number_outlined,
                         title: ar ? 'الرسوم والتذاكر' : 'Tickets and prices',
-                        child: price.confidence == PriceConfidence.notVerified
+                        child: facts?.admissionKind != null
+                            ? Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    ar
+                                        ? (facts!.admissionNameAr ?? 'رسوم الدخول')
+                                        : (facts!.admissionNameEn ?? 'Admission'),
+                                    style: const TextStyle(
+                                        fontWeight: FontWeight.w700),
+                                  ),
+                                  if (facts.admissionJordanian != null)
+                                    _PriceLine(
+                                      label: ar ? 'أردني' : 'Jordanian',
+                                      amount: facts.admissionJordanian!),
+                                  if (facts.admissionResident != null)
+                                    _PriceLine(
+                                      label: ar ? 'مقيم' : 'Resident',
+                                      amount: facts.admissionResident!),
+                                  if (facts.admissionInternational != null)
+                                    _PriceLine(
+                                      label: ar ? 'زائر دولي' : 'International',
+                                      amount: facts.admissionInternational!),
+                                  if (facts.admissionDayVisitor != null)
+                                    _PriceLine(
+                                      label: ar ? 'زيارة ليوم واحد' : 'Same-day visitor',
+                                      amount: facts.admissionDayVisitor!),
+                                  const SizedBox(height: 6),
+                                  if (facts.admissionConditionsEn != null)
+                                    Text(
+                                      ar
+                                        ? (facts.admissionConditionsAr ??
+                                           facts.admissionConditionsEn!)
+                                        : facts.admissionConditionsEn!,
+                                      style: Theme.of(context).textTheme.bodySmall,
+                                    ),
+                                  if (facts.admissionSourceUrl != null)
+                                    _ReferenceLink(
+                                      label: ar ? 'راجع مصدر السعر' : 'Official rate reference',
+                                      url: facts.admissionSourceUrl!,
+                                    ),
+                                  if (facts.admissionCheckedOn != null)
+                                    Text(
+                                      ar ? 'تاريخ التحقق: ${facts.admissionCheckedOn}' :
+                                           'Checked: ${facts.admissionCheckedOn}',
+                                      style: Theme.of(context).textTheme.bodySmall,
+                                    ),
+                                ],
+                              )
+                            : price.confidence == PriceConfidence.notVerified
                             ? Text(ar
                                 ? 'لا تتوفر أسعار دخول موثقة لهذا الموقع. تحقق من الجهة الرسمية.'
                                 : 'No verified admission price is available for this destination.')
@@ -299,11 +373,27 @@ class PlaceDetailsScreen extends StatelessWidget {
                             Text(location),
                             const SizedBox(height: 8),
                             Text(
-                              ar
-                                  ? 'يفتح الزر بحثاً باسم الوجهة في خرائط Google، وليس دبوساً بإحداثيات موثقة. تحقق من الموقع الصحيح.'
-                                  : 'Maps opens a place-name search, not a verified GPS pin. Check the result before navigating.',
+                              facts?.hasSourcedCoordinates == true
+                                  ? (ar
+                                      ? 'إحداثيات الموقع من دائرة الآثار الأردنية؛ لا تضمن موقع بوابة الدخول.'
+                                      : 'Coordinates are sourced from Jordan’s Department of Antiquities; this may not be the visitor entrance.')
+                                  : (ar
+                                      ? 'يفتح الزر بحثاً باسم الوجهة في خرائط Google، وليس دبوساً بإحداثيات موثقة. تحقق من الموقع الصحيح.'
+                                      : 'Maps opens a place-name search, not a verified GPS pin. Check the result before navigating.'),
                               style: Theme.of(context).textTheme.bodySmall,
                             ),
+                            if (facts?.hasSourcedCoordinates == true) ...[
+                              const SizedBox(height: 7),
+                              Text(
+                                '${facts!.gpsLat}, ${facts.gpsLon}',
+                                style: const TextStyle(
+                                    fontWeight: FontWeight.w600),
+                              ),
+                              _ReferenceLink(
+                                label: ar ? 'مصدر الإحداثيات' : 'Coordinate source',
+                                url: facts.gpsSourceUrl!,
+                              ),
+                            ],
                             const SizedBox(height: 10),
                             TextButton.icon(
                               key: const Key('detail_map_search'),
@@ -479,8 +569,13 @@ String _categoryLabel(String category, bool ar) => switch (category) {
 
 Future<void> _openMaps(
     BuildContext context, Place place, {required bool directions}) async {
-  // The dataset does NOT include verified GPS coordinates. Avoid false pins.
-  final query = '${place.name}, Jordan';
+  // Fall back to a name search unless official site-point coordinates exist.
+  // A recorded site point may NOT be the accessible entrance gate.
+  final facts = PlaceVisitFactsRepository.forId(place.id);
+  final query = facts?.hasSourcedCoordinates == true &&
+          facts?.gpsPrecision == 'site_point'
+      ? '${facts!.gpsLat},${facts.gpsLon}'
+      : '${place.name}, Jordan';
   final url = directions
       ? Uri.https('www.google.com', '/maps/dir/',
           {'api': '1', 'destination': query})
