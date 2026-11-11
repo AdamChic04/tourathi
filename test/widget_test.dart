@@ -57,6 +57,16 @@ void main() {
     expect(researched.admissionResident, isNull);
     expect(researched.hoursTextEn, isNotNull);
 
+    final area = PlaceVisitFacts.fromJson({
+      'place_id': 'maan-petra',
+      'gps_lat': 30.33056,
+      'gps_lon': 35.44333,
+      'gps_precision': 'area_reference',
+      'gps_source_url': 'https://whc.unesco.org/en/list/326/maps',
+    });
+    expect(area.hasSourcedCoordinates, isTrue);
+    expect(area.gpsPrecision, 'area_reference');
+
     final unknown = PlaceVisitFacts.fromJson({'place_id': 'ajloun-rason'});
     expect(unknown.hasSourcedCoordinates, isFalse);
     expect(unknown.admissionKind, isNull);

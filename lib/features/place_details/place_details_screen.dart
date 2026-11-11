@@ -374,9 +374,13 @@ class PlaceDetailsScreen extends StatelessWidget {
                             const SizedBox(height: 8),
                             Text(
                               facts?.hasSourcedCoordinates == true
-                                  ? (ar
-                                      ? 'إحداثيات الموقع من دائرة الآثار الأردنية؛ لا تضمن موقع بوابة الدخول.'
-                                      : 'Coordinates are sourced from Jordan’s Department of Antiquities; this may not be the visitor entrance.')
+                                  ? (facts?.gpsPrecision == 'area_reference'
+                                      ? (ar
+                                          ? 'نقطة مرجعية لمنطقة تراثية من اليونسكو، وليست مدخل الموقع. ستبحث الخرائط باسم الوجهة.'
+                                          : 'UNESCO heritage property reference point, not the entrance. Maps will still search by place name.')
+                                      : (ar
+                                          ? 'إحداثيات موقع منشورة من دائرة الآثار الأردنية؛ قد تختلف عن موقع بوابة الدخول.'
+                                          : 'Government-published site coordinates; the entrance may be elsewhere.'))
                                   : (ar
                                       ? 'يفتح الزر بحثاً باسم الوجهة في خرائط Google، وليس دبوساً بإحداثيات موثقة. تحقق من الموقع الصحيح.'
                                       : 'Maps opens a place-name search, not a verified GPS pin. Check the result before navigating.'),

@@ -6,7 +6,7 @@ Research checked **2026-11-11** against the referenced official/government/opera
 
 | Field | With supported data | Without supported data |
 | --- | ---: | ---: |
-| Source-linked GPS site coordinates | 5 | 56 |
+| Sourced site coordinates or heritage-area references | 10 | 51 |
 | Published schedule / office hours | 15 | 46 |
 | Published admission/entry price reference | 28 | 33 |
 
@@ -20,10 +20,12 @@ Every location has a `place_visit_facts` row, even when fields are unavailable. 
 - [Official Petra ticket rates](https://visitpetra.jo/en/Petrafees) and [official Petra opening hours](https://www.visitpetra.jo/en/Openinghours): one-day and special ticket classes, seasonal site/visitor center hours, and Little Petra **ticket office** hours. Ticket office schedules are not guaranteed full site access hours.
 - [Jordan Museums — Jordan Museum](https://museums.visitjordan.com/en/Museum/5), [Abu Jaber museum](https://museums.visitjordan.com/en/museum/13), [Dar as-Saraya](https://museums.visitjordan.com/en/Museum/14), and [Arar's Cultural House](https://museums.visitjordan.com/en/Museum/35): venue-specific opening hours; any listed exceptions are retained.
 - [Jordan Department of Antiquities archaeological site coordinates](https://doa.gov.jo/EN/ListDetails/Archeological_Sites/1157/2) and governorate listings for [Ajloun](https://doa.gov.jo/AR/ListDetails/%D9%85%D9%88%D8%A7%D9%82%D8%B9_%D8%A3%D8%AB%D8%B1%D9%8A%D8%A9/1145/7), [Tafilah](https://doa.gov.jo/AR/ListDetails/%D9%85%D9%88%D8%A7%D9%82%D8%B9_%D8%A3%D8%AB%D8%B1%D9%8A%D8%A9/1145/14), and [Umm ar-Rasas](https://doa.gov.jo/AR/ListDetails/%D9%85%D9%88%D8%A7%D9%82%D8%B9_%D8%A3%D8%AB%D8%B1%D9%8A%D8%A9/1145/8): five site references, **not verified entrance gate locations**.
+- [UNESCO Petra](https://whc.unesco.org/en/list/326/maps), [Quseir Amra](https://whc.unesco.org/en/list/327/maps), [Wadi Rum](https://whc.unesco.org/en/list/1377/maps), [As-Salt](https://whc.unesco.org/en/list/689/maps) and [Umm Al-Jimāl](https://whc.unesco.org/en/list/1721/maps) World Heritage property coordinates: five extra **area reference points**. Because these are not entrance locations, TouRathi continues to open a place-name Maps search for them.
 - [RSCN Azraq operator rates (2025)](https://www.rscn.org.jo/uploaded_files/reservation/AZRAQ%202025-1.pdf) and [RSCN Shaumari operator rates (2025)](https://rscn.org.jo/uploaded_files/reservation/Shaumari%202025-1.pdf): older operator sheets. Discrepancies against the JTB reserve table are flagged; confirm with RSCN before relying on them.
 
 ## Known review issues
 
+- **Wadi Rum** appears under Ma’an in the supplied dataset, but UNESCO nomination material places the protected area in Aqaba Governorate. The original record is flagged for correction.
 - **Dhiban** is classified under Karak in the supplied dataset, but the Department of Antiquities describes it within Madaba Governorate. Its original dataset record is preserved pending correction.
 - **Umm ar-Rasas** appears under different administrative/grouping classifications across sources. Keep its published site coordinates without assuming the supplied governorate assignment is definitive.
 - **Shaumari and Azraq reserve pricing** can differ by publication year and fee/tax treatment. Recheck directly with RSCN.
