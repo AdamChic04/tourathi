@@ -8,10 +8,11 @@ import '../../data/models/models.dart';
 
 /// Explore Jordan — a deliberately simple, photo-led discovery screen.
 ///
-/// This version uses four *sample* destinations and bundled offline image
-/// illustrations. When the places dataset arrives, replace the data source in
-/// [_places] and the asset mapping without changing this view's layout.
-const _categoryKeys = ['all', 'heritage', 'adventure', 'nature'];
+/// The 61-place catalog is loaded from Supabase after sign-in; the same
+/// 61-place list and licensed local images remain available offline.
+const _categoryKeys = [
+  'all', 'heritage', 'museums', 'religious', 'hiking', 'adventure', 'food',
+];
 
 enum _ExploreSort { featured, name }
 enum _ExploreView { grid, overview }
@@ -32,21 +33,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
 
   List<Place> get _places => JordanPlaceSeed.places;
 
-  String _categoryOf(Place place) {
-    switch (place.category) {
-      case 'heritage':
-      case 'museums':
-      case 'religious':
-      case 'food':
-        return 'heritage';
-      case 'adventure':
-        return 'adventure';
-      case 'hiking':
-        return 'nature';
-      default:
-        return 'all';
-    }
-  }
+  String _categoryOf(Place place) => place.category;
 
   List<Place> _filtered(List<Place> source, AppProvider provider) {
     final text = _searchController.text.trim().toLowerCase();
@@ -457,8 +444,14 @@ String _categoryLabel(String key, bool isArabic) {
       return isArabic ? 'الكل' : 'All';
     case 'heritage':
       return isArabic ? 'التراث' : 'Heritage';
-    case 'nature':
-      return isArabic ? 'الطبيعة' : 'Nature';
+    case 'museums':
+      return isArabic ? 'المتاحف' : 'Museums';
+    case 'religious':
+      return isArabic ? 'الدينية' : 'Religious';
+    case 'hiking':
+      return isArabic ? 'المشي والطبيعة' : 'Nature & Hiking';
+    case 'food':
+      return isArabic ? 'الطعام والحرف' : 'Food & Crafts';
     case 'adventure':
       return isArabic ? 'المغامرة' : 'Adventure';
     default:

@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 
+import '../../data/mock/jordan_place_seed.dart';
+import '../../data/repositories/place_repository.dart';
+
 /// App-level presentation state. Favorites are session-only in this demo.
 class AppProvider extends ChangeNotifier {
   Locale _locale = const Locale('en');
@@ -10,6 +13,26 @@ class AppProvider extends ChangeNotifier {
   bool get isArabic => _locale.languageCode == 'ar';
   ThemeMode get themeMode => _themeMode;
   bool isFavorite(String placeId) => _favorites.contains(placeId);
+
+  bool _loadingPlaces = false;
+
+  /// Reloads the catalog after login. Every screen and the planner reads the
+  /// same current list; until this succeeds they show the bundled 61 places.
+  Future<void> refreshPlaces() async {
+    if (_loadingPlaces) return;
+    _loadingPlaces = true;
+    try {
+      final places = await PlaceRepository.fetchPublished();
+      if (places.isNotEmpty) {
+        JordanPlaceSeed.setRemotePlaces(places);
+        notifyListeners();
+      }
+    } catch (error) {
+      debugPrint('Could not load places from Supabase; using offline list: $error');
+    } finally {
+      _loadingPlaces = false;
+    }
+  }
 
   void toggleFavorite(String placeId) {
     if (!_favorites.add(placeId)) _favorites.remove(placeId);

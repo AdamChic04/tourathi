@@ -17,6 +17,14 @@ class _MainShellState extends State<MainShell> {
   int _index = 0;
 
   @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) context.read<AppProvider>().refreshPlaces();
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     final arabic = context.watch<AppProvider>().isArabic;
     return Scaffold(
