@@ -19,7 +19,7 @@ class PlaceVisitFactsRepository {
           'admission_jordanian,admission_resident,admission_international,'
           'admission_day_visitor,admission_unit_en,admission_unit_ar,'
           'admission_conditions_en,admission_conditions_ar,'
-          'admission_source_url,admission_checked_on',
+          'admission_source_url,admission_source_name,admission_checked_on',
         );
     final info = <String, PlaceVisitFacts>{};
     for (final row in rows) {

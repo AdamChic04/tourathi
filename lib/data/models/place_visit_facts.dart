@@ -25,6 +25,7 @@ class PlaceVisitFacts {
     this.admissionConditionsEn,
     this.admissionConditionsAr,
     this.admissionSourceUrl,
+    this.admissionSourceName,
     this.admissionCheckedOn,
   });
 
@@ -51,6 +52,7 @@ class PlaceVisitFacts {
   final String? admissionConditionsEn;
   final String? admissionConditionsAr;
   final String? admissionSourceUrl;
+  final String? admissionSourceName;
   final String? admissionCheckedOn;
 
   bool get hasSourcedCoordinates =>
@@ -85,6 +87,7 @@ class PlaceVisitFacts {
         admissionConditionsEn: _string(row['admission_conditions_en']),
         admissionConditionsAr: _string(row['admission_conditions_ar']),
         admissionSourceUrl: _string(row['admission_source_url']),
+        admissionSourceName: _string(row['admission_source_name']),
         admissionCheckedOn: _string(row['admission_checked_on']),
       );
 }
