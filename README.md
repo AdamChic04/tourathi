@@ -38,6 +38,18 @@ The app loads researched facts from Supabase after sign-in. The destination page
 
 See [visitor research notes](RESEARCH_VISIT_FACTS.md) and the SQL migration and repeatable seed in `supabase/`.
 
+## AI itinerary planner — complete catalog eligibility
+
+The existing wizard, saved plans, local itinerary generator, and optional Cloudflare Workers AI integration now consider **every matching destination in the 61-place catalog**, not just places with published admission prices.
+
+- Known per-person admission fees prefer Supabase `place_visit_facts`; the local source-based catalog is the offline fallback. Vehicle admission cannot be treated as a per-person charge.
+- Missing prices remain **unknown**, never free. The itinerary presents known-price **subtotals** plus a prominent warning and count of unpriced stops. Such plans cannot claim that the trip fits the user's budget.
+- The AI Worker accepts nullable price fields and explicitly warns the model not to invent costs. **Redeploy** the Worker after pulling these updates if you use cloud AI; otherwise the on-device planner remains usable.
+- Saved plans retain the IDs of unpriced stops and show the same incomplete-cost warning when reopened.
+- Published Supabase hours are preferred for individual itinerary stops; live opening status, actual routes, and travel times still require verification.
+
+See [the AI Planner Worker README](workers/ai-planner/README.md) for deployment details.
+
 ## Not implemented yet
 
 Organizer/seller/admin portals, AI image/video generator, AR, full maps/navigation, marketplace, group chat, and bookings. Authentication and the secure user profile/role tables are now connected to Supabase. Visible shortcut buttons for upcoming features lead to an explicit **Coming soon** screen.

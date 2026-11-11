@@ -27,6 +27,10 @@ Without `AI_PLANNER_API_URL`, the planner uses its on-device, catalog-constraine
 
 ## Travel data limits
 
-The app sends only places with a source-backed, checked price to the model. Each saved estimate records its source URL and check date. Petra's seasonal opening hours come from the Petra Authority's published schedule; other hours and live closures are marked unverified. The place seed has no geocoordinates or route graph, so the Worker must not claim drive durations or shortest routes. There is no connected live closure, traffic, public-transit, hotel, or accessibility feed in this repository. Confirm these details with official venues/providers before booking.
+The app now sends **all matching destinations from the 61-place catalog**, including attractions with unknown admission prices. An unverified price is serialized as `null` with `costStatus: "unknown"` and can **never** count as zero or an affordable booking. Only published ticket/activity references contribute to the known-cost subtotal. If the chosen itinerary includes an unpriced stop, the trip's total cost remains **unknown** even when the known subtotal is below the budget.
 
-The AI output is schema-checked against supplied catalog IDs and the client rechecks cost against the source-backed price catalog. Treat output as planning assistance, not a booking or accessibility guarantee.
+The app reads source-attributed admission and opening-hours research from Supabase after authentication, with offline source-based references if needed. Opening hours, fees, route times and closures are not live; the five UNESCO property points are **area references**, not usable entrance pins. There is no live traffic, route graph, transit, hotel, weather, or guaranteed-access feed in this repository. Confirm details with official venues/operators.
+
+**Important:** If this Worker was deployed before the catalog change, redeploy it (`npx wrangler deploy`) because the request schema now accepts null prices. The old deployed Worker will reject requests containing unknown prices; Flutter then uses the local planner automatically.
+
+The AI output is schema-checked against supplied catalog IDs. The client budgets only published amounts and explicitly marks unpriced destinations. Neither the AI nor the local algorithm guarantees an overall affordable itinerary if unknown prices remain. Treat output as planning assistance, not a booking or accessibility guarantee.

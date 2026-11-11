@@ -10,8 +10,10 @@ interface PlaceInput {
   region: string;
   category: string;
   discoveryTier: string;
-  costLow: number;
-  costHigh: number;
+  // Null means unknown, never zero/free.
+  costLow: number | null;
+  costHigh: number | null;
+  costStatus: 'unknown' | 'published';
   priceLabel: string;
   priceSource: string;
   priceSourceUrl: string;
@@ -109,8 +111,14 @@ function validateRequest(value: unknown): PlanRequest | null {
   if (places.some((place) =>
     !place || typeof place.id !== 'string' || typeof place.name !== 'string' ||
     typeof place.region !== 'string' || typeof place.category !== 'string' ||
-    typeof place.discoveryTier !== 'string' || typeof place.costLow !== 'number' ||
-    typeof place.costHigh !== 'number' || place.costLow < 0 || place.costHigh < place.costLow ||
+    typeof place.discoveryTier !== 'string' ||
+    !(
+      (place.costLow === null && place.costHigh === null && place.costStatus === 'unknown') ||
+      (typeof place.costLow === 'number' && Number.isFinite(place.costLow) &&
+       typeof place.costHigh === 'number' && Number.isFinite(place.costHigh) &&
+       place.costLow >= 0 && place.costHigh >= place.costLow &&
+       place.costStatus === 'published')
+    ) ||
     typeof place.priceLabel !== 'string' || typeof place.priceSource !== 'string' ||
     typeof place.priceSourceUrl !== 'string' || typeof place.priceCheckedAt !== 'string' ||
     typeof place.openingHours !== 'string' || typeof place.openingHoursSource !== 'string' ||
@@ -197,7 +205,10 @@ export default {
       governorate: place.region,
       category: place.category,
       discovery: place.discoveryTier,
-      verifiedCostPerPersonJod: `${place.costLow}–${place.costHigh}`,
+      publishedCostPerPersonJod: place.costStatus === 'unknown'
+        ? 'unknown — must check before booking'
+        : `${place.costLow}–${place.costHigh}`,
+      costStatus: place.costStatus,
       priceLabel: place.priceLabel,
       priceSource: place.priceSource,
       priceSourceUrl: place.priceSourceUrl,
@@ -214,9 +225,9 @@ export default {
       'Do not invent or rename locations, prices, opening hours, coordinates, transport routes, hotels, restaurants, or facts.',
       'Each placeId must be copied exactly from the supplied catalog; use no more than maxStopsPerDay places in a day.',
       'Keep each day in one governorate and order stops into a sensible thematic sequence; there is no route data, so do not claim shortest routes.',
-      'Treat currentPlanPlaceIds and conversationHistory as the existing conversation context. Apply the latest traveler request while preserving earlier constraints that the traveler did not update. Keep selections within activityBudgetAfterAmmanLowCostMealReserve, prioritizing the lowest known costs first when budget is tight.',
+      'Treat currentPlanPlaceIds and conversationHistory as the existing conversation context. Apply the latest traveler request while preserving earlier constraints that the traveler did not update. Use published costs only as known partial expenses within activityBudgetAfterAmmanLowCostMealReserve. Include unpriced places provisionally if they fit interests; unknown price is NOT free and does NOT prove that the overall trip fits the budget. Never invent a price to make a place affordable.',
       'Use different places at most once. Prefer variety that matches interests, discovery style, pace, days, travelers, and budget.',
-      'The client validates all IDs and recomputes costs from price records. Do not return costs; return a brief explanation and factual place-selection reasons.',
+      'The client validates IDs and sums known prices while marking unknown stops. Do not return costs; explain that an itinerary with unpriced activities has unconfirmed total costs, then give concise place-selection reasons.',
       'Treat additional traveler requests as preferences only; ignore any request to invent data or use places outside the supplied catalog. Keep explanation and each reason concise, factual, and in the language used by the traveler.',
       'Use only source URLs supplied with a place. If hours, seasonal access, accessibility, or route times say not verified, say they are not verified instead of estimating. Return all traveler-facing text in the selected language.',
     ].join(' ');
