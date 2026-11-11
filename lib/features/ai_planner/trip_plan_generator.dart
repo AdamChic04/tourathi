@@ -6,6 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../data/mock/jordan_place_seed.dart';
 import '../../data/models/models.dart';
+import '../../data/repositories/place_visit_facts_repository.dart';
 import 'jordan_price_catalog.dart';
 import 'jordan_visit_info.dart';
 
@@ -106,6 +107,7 @@ class PlanGenerationResult {
     required this.explanation,
     required this.placeReasons,
     this.alternatives = const [],
+    this.unpricedPlaceIds = const [],
   });
 
   final List<GeneratedPlanDay> days;
@@ -118,6 +120,9 @@ class PlanGenerationResult {
   final String explanation;
   final Map<String, String> placeReasons;
   final List<Place> alternatives;
+  /// Published fee references are missing for these selected stops.
+  final List<String> unpricedPlaceIds;
+  bool get hasUnknownCosts => unpricedPlaceIds.isNotEmpty;
 }
 
 class _AiProposal {
@@ -142,7 +147,7 @@ class TripPlanGenerator {
     if (eligible.isEmpty) {
       return _emptyResult(
         preferences,
-        'No priced catalog places match these preferences.',
+        'No destinations match these preferences. Broaden the region, interests, or discovery style.',
       );
     }
 
@@ -176,7 +181,8 @@ class TripPlanGenerator {
       days: List.unmodifiable(scheduled),
       estimatedLow: amounts.$1,
       estimatedHigh: amounts.$2,
-      suggestedBudget: max(amounts.$1, amounts.$2),
+      suggestedBudget: amounts.$3.isEmpty ? max(amounts.$1, amounts.$2) : 0,
+      unpricedPlaceIds: List.unmodifiable(amounts.$3),
       usedAi: proposal != null,
       statusMessage:
           proposal != null
@@ -185,7 +191,7 @@ class TripPlanGenerator {
       preferences: preferences,
       explanation:
           proposal == null
-              ? 'Built from the project place catalog using matching categories and official or published price records. Live hours and route information are unavailable for most locations.'
+              ? 'Built from matching Jordan destinations including sites with unknown admission fees. The cost figures cover published amounts only; live hours and routes are not guaranteed.'
               : proposal.explanation,
       placeReasons:
           proposal == null
@@ -227,17 +233,10 @@ class TripPlanGenerator {
           };
           return destinationMatches && interestMatches && discoveryMatches;
         }).toList();
-    // Unknown prices are never treated as free and cannot be budget-fitted.
-    final priced =
-        all
-            .where(
-              (place) => JordanPriceCatalog.forPlaceId(place.id).isVerified,
-            )
-            .toList();
-    priced.sort(
-      (a, b) => _score(b, preferences).compareTo(_score(a, preferences)),
-    );
-    return priced;
+    // Price availability must not determine whether a location can be
+    // considered. Unknown cost means provisional, NOT free.
+    all.sort((a, b) => _score(b, preferences).compareTo(_score(a, preferences)));
+    return all;
   }
 
   int _score(Place place, PlannerPreferences preferences) {
@@ -285,6 +284,7 @@ class TripPlanGenerator {
             );
             final low = _unitLow(price, preferences.visitorClass);
             final high = _unitHigh(price, preferences.visitorClass);
+            final researched = PlaceVisitFactsRepository.forId(place.id);
             return {
               'id': place.id,
               'name': place.name,
@@ -293,16 +293,22 @@ class TripPlanGenerator {
               'discoveryTier': place.discoveryTier,
               'costLow': low,
               'costHigh': high,
+              'costStatus': low == null || high == null ? 'unknown' : 'published',
               'priceLabel': '${price.label}; ${price.conditions}',
               'priceSource': price.sourceName,
               'priceSourceUrl': price.sourceUrl,
               'priceCheckedAt': price.checkedAt,
-              'openingHours': visit?.hours ?? 'not verified',
-              'openingHoursSource': visit?.sourceName ?? '',
-              'openingHoursSourceUrl': visit?.sourceUrl ?? '',
-              'openingHoursCheckedAt': visit?.checkedAt ?? '',
-              'accessConditions':
-                  visit?.conditions ?? 'not verified; confirm with venue',
+              'openingHours': researched?.hoursTextEn ??
+                  visit?.hours ?? 'not verified',
+              'openingHoursSource': researched?.hoursSourceName ??
+                  visit?.sourceName ?? '',
+              'openingHoursSourceUrl': researched?.hoursSourceUrl ??
+                  visit?.sourceUrl ?? '',
+              'openingHoursCheckedAt': researched?.hoursCheckedOn ??
+                  visit?.checkedAt ?? '',
+              'accessConditions': researched?.hoursTextEn != null
+                  ? 'Published schedule, not live hours. Verify site access.'
+                  : visit?.conditions ?? 'not verified; confirm with venue',
             };
           }).toList(),
     };
@@ -364,7 +370,7 @@ class TripPlanGenerator {
               0,
               (decoded['explanation'] as String).length.clamp(0, 600),
             )
-            : 'Plan tailored to your travel details and the verified project catalog.';
+            : 'Plan tailored to your travel details and the Jordan destination catalog.';
     return _AiProposal(
       days: groups,
       explanation: explanation,
@@ -379,8 +385,8 @@ class TripPlanGenerator {
     for (final place in days.expand((day) => day.places))
       place.id:
           preferences.interests.isEmpty
-              ? 'Selected from the available priced catalog for your destination and budget.'
-              : 'Matches your ${preferences.interests.join(', ')} interest selection and available price data.',
+              ? 'Suggested from the Jordan catalog. Check prices and site access.'
+              : 'Matches your ${preferences.interests.join(', ')} interests. Prices may be unknown.',
   };
 
   Future<String> _installId() async {
@@ -420,12 +426,13 @@ class TripPlanGenerator {
               .where((p) => p.location.split(',').first.trim() == region)
               .toList()) {
         if (dayPlaces.length >= preferences.stopsPerDay) break;
-        final next =
-            _personCostLow(place, preferences.visitorClass) *
-            preferences.travelers;
-        if (spent + next > preferences.budgetForActivities) continue;
+        final knownUnitCost = _personCostLow(place, preferences.visitorClass);
+        final knownGroupCost =
+            knownUnitCost == null ? null : knownUnitCost * preferences.travelers;
+        if (knownGroupCost != null &&
+            spent + knownGroupCost > preferences.budgetForActivities) continue;
         dayPlaces.add(place.id);
-        spent += next;
+        if (knownGroupCost != null) spent += knownGroupCost;
         remaining.remove(place);
       }
       if (dayPlaces.isNotEmpty) {
@@ -464,12 +471,13 @@ class TripPlanGenerator {
       for (final id in ids.take(preferences.stopsPerDay)) {
         final place = byId[id];
         if (place == null) continue;
-        final cost =
-            _personCostLow(place, preferences.visitorClass) *
-            preferences.travelers;
-        if (spent + cost > preferences.budgetForActivities) continue;
+        final knownUnitCost = _personCostLow(place, preferences.visitorClass);
+        final knownGroupCost =
+            knownUnitCost == null ? null : knownUnitCost * preferences.travelers;
+        if (knownGroupCost != null &&
+            spent + knownGroupCost > preferences.budgetForActivities) continue;
         selected.add(place);
-        spent += cost;
+        if (knownGroupCost != null) spent += knownGroupCost;
       }
       if (selected.isNotEmpty) {
         result.add(
@@ -484,33 +492,41 @@ class TripPlanGenerator {
     return result;
   }
 
-  (double, double) _totals(
+  (double, double, List<String>) _totals(
     List<GeneratedPlanDay> days,
     PlannerPreferences preferences,
   ) {
     var low = 0.0;
     var high = 0.0;
+    final unpriced = <String>[];
     for (final day in days) {
       for (final place in day.places) {
         final estimate = JordanPriceCatalog.forPlaceId(place.id);
-        low +=
-            _unitLow(estimate, preferences.visitorClass) *
-            preferences.travelers;
-        high +=
-            _unitHigh(estimate, preferences.visitorClass) *
-            preferences.travelers;
+        final unitLow = _unitLow(estimate, preferences.visitorClass);
+        final unitHigh = _unitHigh(estimate, preferences.visitorClass);
+        if (unitLow == null || unitHigh == null) {
+          unpriced.add(place.id);
+          continue;
+        }
+        low += unitLow * preferences.travelers;
+        high += unitHigh * preferences.travelers;
       }
     }
-    return (low, high);
+    // Total is the subtotal for KNOWN published items only.
+    return (low, high, unpriced);
   }
 
-  double _unitLow(PriceEstimate estimate, VisitorRateClass visitorClass) =>
-      estimate.forVisitor(visitorClass) ?? estimate.low ?? 0;
+  double? _unitLow(PriceEstimate estimate, VisitorRateClass visitorClass) =>
+      estimate.isVerified
+          ? estimate.forVisitor(visitorClass) ?? estimate.low
+          : null;
 
-  double _unitHigh(PriceEstimate estimate, VisitorRateClass visitorClass) =>
-      estimate.high ?? estimate.forVisitor(visitorClass) ?? estimate.low ?? 0;
+  double? _unitHigh(PriceEstimate estimate, VisitorRateClass visitorClass) =>
+      estimate.isVerified
+          ? estimate.high ?? estimate.forVisitor(visitorClass) ?? estimate.low
+          : null;
 
-  double _personCostLow(Place place, VisitorRateClass visitorClass) =>
+  double? _personCostLow(Place place, VisitorRateClass visitorClass) =>
       _unitLow(JordanPriceCatalog.forPlaceId(place.id), visitorClass);
 
   PlanGenerationResult _emptyResult(
@@ -556,14 +572,13 @@ class TripPlanGenerator {
 
   double _cheapestKnown(PlannerPreferences preferences) {
     final places = _eligiblePlaces(preferences);
-    if (places.isEmpty) return 0;
-    return places
-        .map(
-          (place) =>
-              _personCostLow(place, preferences.visitorClass) *
-              preferences.travelers,
-        )
-        .reduce(min);
+    final known = places
+        .map((place) => _personCostLow(place, preferences.visitorClass))
+        .whereType<double>()
+        .map((amount) => amount * preferences.travelers)
+        .toList();
+    if (known.isEmpty) return 0;
+    return known.reduce(min);
   }
 
   String _friendlyError(Object error) {

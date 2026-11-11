@@ -37,6 +37,7 @@ class SavedPlanRecord {
     required this.usedAi,
     required this.days,
     required this.priceSnapshots,
+    this.unpricedPlaceIds = const [],
     this.travelDate = '',
     this.startLocation = 'Amman',
     this.mobilityNeeds = '',
@@ -64,6 +65,8 @@ class SavedPlanRecord {
   final bool usedAi;
   final List<SavedPlanDay> days;
   final Map<String, Map<String, Object?>> priceSnapshots;
+  /// Saved unpriced stops remain explicitly unknown when reopened offline.
+  final List<String> unpricedPlaceIds;
   final String travelDate;
   final String startLocation;
   final String mobilityNeeds;
@@ -91,6 +94,7 @@ class SavedPlanRecord {
     'usedAi': usedAi,
     'days': days.map((day) => day.toJson()).toList(),
     'priceSnapshots': priceSnapshots,
+    'unpricedPlaceIds': unpricedPlaceIds,
     'travelDate': travelDate,
     'startLocation': startLocation,
     'mobilityNeeds': mobilityNeeds,
@@ -135,6 +139,15 @@ class SavedPlanRecord {
             : <String, Object?>{},
       ),
     ),
+    unpricedPlaceIds: (json['unpricedPlaceIds'] as List<dynamic>? ??
+            (json['priceSnapshots'] as Map<String, dynamic>? ?? const {})
+                .entries
+                .where((entry) => entry.value is Map &&
+                    (entry.value as Map)['confidence'] == 'notVerified')
+                .map((entry) => entry.key)
+                .toList())
+        .whereType<String>()
+        .toList(growable: false),
     travelDate: json['travelDate'] as String? ?? '',
     startLocation: json['startLocation'] as String? ?? 'Amman',
     mobilityNeeds: json['mobilityNeeds'] as String? ?? '',

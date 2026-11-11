@@ -11,6 +11,7 @@ class PlaceVisitFacts {
     this.hoursTextEn,
     this.hoursTextAr,
     this.hoursSourceUrl,
+    this.hoursSourceName,
     this.hoursCheckedOn,
     this.admissionKind,
     this.admissionNameEn,
@@ -36,6 +37,7 @@ class PlaceVisitFacts {
   final String? hoursTextEn;
   final String? hoursTextAr;
   final String? hoursSourceUrl;
+  final String? hoursSourceName;
   final String? hoursCheckedOn;
   final String? admissionKind;
   final String? admissionNameEn;
@@ -69,6 +71,7 @@ class PlaceVisitFacts {
         hoursTextEn: _string(row['hours_text_en']),
         hoursTextAr: _string(row['hours_text_ar']),
         hoursSourceUrl: _string(row['hours_source_url']),
+        hoursSourceName: _string(row['hours_source_name']),
         hoursCheckedOn: _string(row['hours_checked_on']),
         admissionKind: _string(row['admission_kind']),
         admissionNameEn: _string(row['admission_name_en']),
