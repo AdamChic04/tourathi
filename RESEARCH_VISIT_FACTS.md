@@ -27,7 +27,7 @@ Every location has a `place_visit_facts` row, even when fields are unavailable. 
 
 - **Wadi Rum** appears under Ma’an in the supplied dataset, but UNESCO nomination material places the protected area in Aqaba Governorate. The original record is flagged for correction.
 - **Dhiban** is classified under Karak in the supplied dataset, but the Department of Antiquities describes it within Madaba Governorate. Its original dataset record is preserved pending correction.
-- **Umm ar-Rasas** appears under different administrative/grouping classifications across sources. Keep its published site coordinates without assuming the supplied governorate assignment is definitive.
+- **Umm ar-Rasas** appears under different administrative/grouping classifications across sources. The Department of Antiquities and [UNESCO](https://whc.unesco.org/en/list/1093/maps) publish differing reference positions, so the recorded DoA coordinate is classified as an **area reference** and cannot be used as a precise Maps destination until an entrance is confirmed.
 - **Shaumari and Azraq reserve pricing** can differ by publication year and fee/tax treatment. Recheck directly with RSCN.
 - **Desert castles** use a group-ticket reference; a listed fee does not establish whether the ticket grants access to multiple sites or confirms those sites' opening status.
 - Many places are villages, trail areas, seasonal waterfalls, or bookable experiences rather than staffed attractions. Opening hours and fixed admission prices may not exist. **No free-entry claim is inferred**.
