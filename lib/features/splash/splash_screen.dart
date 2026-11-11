@@ -2,6 +2,7 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_typography.dart';
@@ -9,8 +10,7 @@ import '../../core/theme/app_typography.dart';
 /// Animated launch screen.
 ///
 /// Starts at `/`, reveals the TouRathi compass mark and wordmark, then
-/// automatically navigates to `/main` (the Home tab). No login, onboarding,
-/// internet request or new dependencies are required for this demo flow.
+/// navigates to sign-in for new visitors or Home for an existing session.
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
 
@@ -40,8 +40,9 @@ class _SplashScreenState extends State<SplashScreen>
     _entrance.addStatusListener((status) {
       if (status == AnimationStatus.completed && mounted && !_hasNavigated) {
         _hasNavigated = true;
-        // Go straight to the existing home tab, not to onboarding.
-        context.go('/main');
+        // Keep the animation; authentication decides the next screen.
+        final signedIn = Supabase.instance.client.auth.currentSession != null;
+        context.go(signedIn ? '/main' : '/login');
       }
     });
     _entrance.forward();

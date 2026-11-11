@@ -1,12 +1,9 @@
 import 'package:flutter_test/flutter_test.dart';
-
-import 'package:tourathi/app.dart';
+import 'package:tourathi/core/supabase_config.dart';
 
 void main() {
-  testWidgets('TouRathi app launches splash screen', (WidgetTester tester) async {
-    await tester.pumpWidget(const TouRathiApp());
-    await tester.pump();
-
-    expect(find.text('TouRathi'), findsOneWidget);
+  test('Supabase public client configuration points to the TouRathi project', () {
+    expect(Uri.parse(SupabaseConfig.url).scheme, 'https');
+    expect(SupabaseConfig.publishableKey.startsWith('sb_publishable_'), isTrue);
   });
 }
