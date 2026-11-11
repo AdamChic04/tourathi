@@ -28,6 +28,16 @@ The current photo set has **one image per destination**, not a multi-image galle
 
 The 61 editorial descriptions are marked unverified in Supabase; official visitor details must be confirmed before travel.
 
+## Research-backed visitor facts
+
+Each of the 61 destinations has a record in `public.place_visit_facts`, with nullable, independently source-linked coordinates, published hours, admission fee categories and check dates.
+
+As of 2026-11-11, **10** have published source coordinates (5 site points, 5 UNESCO heritage property reference points), **15** have source-based schedules, and **28** have admission/entrance fee references. All other fields are **unknown, not free / not open**. Some published rates are from older operator sheets or grouped government schedules, and conditions must be checked before traveling.
+
+The app loads researched facts from Supabase after sign-in. The destination page prefers researched details, showing direct source links and check dates. Only destinations with site-point coordinates use coordinates for Google Maps; UNESCO area reference points and all other places use a name search.
+
+See [visitor research notes](RESEARCH_VISIT_FACTS.md) and the SQL migration and repeatable seed in `supabase/`.
+
 ## Not implemented yet
 
 Organizer/seller/admin portals, AI image/video generator, AR, full maps/navigation, marketplace, group chat, and bookings. Authentication and the secure user profile/role tables are now connected to Supabase. Visible shortcut buttons for upcoming features lead to an explicit **Coming soon** screen.

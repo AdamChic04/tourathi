@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../data/mock/jordan_place_seed.dart';
 import '../../data/repositories/place_repository.dart';
+import '../../data/repositories/place_visit_facts_repository.dart';
 
 /// App-level presentation state. Favorites are session-only in this demo.
 class AppProvider extends ChangeNotifier {
@@ -30,6 +31,13 @@ class AppProvider extends ChangeNotifier {
     } catch (error) {
       debugPrint('Could not load places from Supabase; using offline list: $error');
     } finally {
+      try {
+        // Fact refresh fails independently of the base 61-place catalog.
+        await PlaceVisitFactsRepository.refresh();
+        notifyListeners();
+      } catch (error) {
+        debugPrint('Visitor facts unavailable; offline references remain: $error');
+      }
       _loadingPlaces = false;
     }
   }
