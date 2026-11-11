@@ -10,7 +10,13 @@ This repository contains **only the TouRathi screens developed so far**, not the
 - Simple destination-details screen and working Home / Explore navigation.
 - English and Arabic labels, light / dark theme foundations.
 
-All four bundled destination images are **AI-generated illustrative demo images**, not actual photographs of the sites. Place ratings and descriptions are sample content. Favorites currently last only while the app is running.
+The catalog contains 61 destinations in 12 governorates, with 61 bundled licensed images. Image sources and reuse terms are documented in [image attributions](assets/images/places/ATTRIBUTION.md); some are regional representative images, not exact-site photographs. Place descriptions are prototype text, and ratings are unavailable. Favorites currently last only while the app is running.
+
+## Place catalog and Supabase
+
+The project's 61 owner-supplied destinations are stored in the `public.places` table, with protected read access to authenticated users. Home, Explore and the existing itinerary planner read the same in-memory catalog after it refreshes from Supabase; the matching bundled data and images work as a fallback when offline. Supabase migrations and an idempotent seed SQL file are in `supabase/`.
+
+Real-time map navigation, verified opening hours, prices, coordinates, and public visitor ratings are not supplied by this dataset.
 
 ## Not implemented yet
 

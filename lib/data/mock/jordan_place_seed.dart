@@ -22,7 +22,7 @@ class JordanPlaceSeed {
         discoveryTier: kind.contains('famous') ? 'famous' : 'local_or_mixed',
       );
 
-  static final List<Place> places = [
+  static final List<Place> _offlinePlaces = [
     _place('amman-roman-theatre', 'Roman Theatre', 'المدرج الروماني', 'Amman', 'heritage', 'famous'),
     _place('amman-citadel', 'Amman Citadel', 'جبل القلعة', 'Amman', 'heritage', 'famous'),
     _place('amman-jordan-museum', 'The Jordan Museum', 'متحف الأردن', 'Amman', 'museums', 'famous'),
@@ -86,7 +86,22 @@ class JordanPlaceSeed {
     _place('aqaba-boat-trips', 'Red Sea boat and snorkeling experiences', 'رحلات القوارب والغطس في البحر الأحمر', 'Aqaba', 'adventure', 'local activity; verify licensed provider'),
   ];
 
-  static List<String> get categories => places.map((place) => place.category).toSet().toList();
+  /// Bundled catalog is always available while offline or before sign-in.
+  static List<Place> get offlinePlaces => _offlinePlaces;
+
+  static List<Place>? _remotePlaces;
+  static List<Place> get places => _remotePlaces ?? _offlinePlaces;
+
+  /// Loaded from Supabase after successful authentication. Fallback remains
+  /// available if the network or database is temporarily unreachable.
+  static void setRemotePlaces(List<Place> records) {
+    if (records.isNotEmpty) {
+      _remotePlaces = List<Place>.unmodifiable(records);
+    }
+  }
+
+  static List<String> get categories =>
+      places.map((place) => place.category).toSet().toList();
 }
 
 
