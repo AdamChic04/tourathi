@@ -1,6 +1,8 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tourathi/core/supabase_config.dart';
 import 'package:tourathi/data/mock/jordan_place_seed.dart';
+import 'package:tourathi/data/content/destination_guides.dart';
+import 'package:tourathi/data/media/place_photo_credits.dart';
 import 'package:tourathi/data/repositories/place_repository.dart';
 
 void main() {
@@ -15,6 +17,23 @@ void main() {
     expect(all.map((p) => p.id).toSet().length, 61);
     expect(all.map((p) => p.category).toSet().length, 6);
     expect(all.every((p) => p.imageUrl.endsWith('${p.id}.jpg')), isTrue);
+  });
+
+  test('Each destination has a distinct guide and a credited image', () {
+    final list = JordanPlaceSeed.offlinePlaces;
+    expect(DestinationGuides.count, 61);
+    expect(PlacePhotoCredits.count, 61);
+    for (final place in list) {
+      final guide = DestinationGuides.forId(place.id);
+      final credit = PlacePhotoCredits.forId(place.id);
+      expect(guide, isNotNull, reason: place.id);
+      expect(credit, isNotNull, reason: place.id);
+      expect(place.description, guide!.en);
+      expect(place.descriptionAr, guide.ar);
+      expect(credit!.sourceUrl.startsWith('https://'), isTrue);
+      expect(credit.licenseUrl.startsWith('https://'), isTrue);
+    }
+    expect(PlacePhotoCredits.forId('irbid-wadi-ziglab')!.isRepresentative, isTrue);
   });
 
   test('A Supabase row maps to the Flutter place model', () {

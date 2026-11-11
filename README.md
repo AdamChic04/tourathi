@@ -18,6 +18,16 @@ The project's 61 owner-supplied destinations are stored in the `public.places` t
 
 Real-time map navigation, verified opening hours, prices, coordinates, and public visitor ratings are not supplied by this dataset.
 
+## Destination details (new)
+
+Every one of the 61 destinations now has an English/Arabic editorial overview, a full-bleed photo hero with pinch-to-zoom viewer, visible photo creator/license/source attribution, same-governorate suggestions, and a Google Maps search/directions shortcut.
+
+Hours appear **only** where a source record exists (currently Petra). Published price references show their source and check date; they are not live ticket prices, and some refer to guided activities rather than site entry. No price is invented for unverified locations.
+
+The current photo set has **one image per destination**, not a multi-image gallery. Some photos are representative of the wider region, which the UI labels explicitly. Directions launch Google Maps using a place-name search: the catalog does not have validated coordinates, so users must verify the map result.
+
+The 61 editorial descriptions are marked unverified in Supabase; official visitor details must be confirmed before travel.
+
 ## Not implemented yet
 
 Organizer/seller/admin portals, AI image/video generator, AR, full maps/navigation, marketplace, group chat, and bookings. Authentication and the secure user profile/role tables are now connected to Supabase. Visible shortcut buttons for upcoming features lead to an explicit **Coming soon** screen.
