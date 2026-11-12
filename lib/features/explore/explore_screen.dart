@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../core/providers/app_provider.dart';
 import '../../data/mock/jordan_place_seed.dart';
+import '../../data/services/place_map_links.dart';
 import '../../data/models/models.dart';
 
 /// Explore Jordan — a deliberately simple, photo-led discovery screen.
@@ -71,6 +73,26 @@ class _ExploreScreenState extends State<ExploreScreen> {
       _savedOnly = false;
       _sort = _ExploreSort.featured;
     });
+  }
+
+  Future<void> _openLocation(Place place) async {
+    try {
+      final opened = await launchUrl(
+        PlaceMapLinks.search(place),
+        mode: LaunchMode.externalApplication,
+      );
+      if (!opened && mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Could not open Google Maps.')),
+        );
+      }
+    } catch (_) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Could not open Google Maps.')),
+        );
+      }
+    }
   }
 
   @override
@@ -254,7 +276,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          ar ? '${results.length} وجهات تجريبية' : '${results.length} sample destinations',
+                          ar ? '${results.length} وجهة من الأردن' : '${results.length} Jordan destinations',
                           style: TextStyle(color: palette.muted, fontSize: 12),
                         ),
                       ],
@@ -316,7 +338,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
                   _ViewOption(
                     key: const Key('explore_map_view'),
                     icon: Icons.map_outlined,
-                    label: ar ? 'نظرة على الخريطة' : 'Map overview',
+                    label: ar ? 'المواقع' : 'Locations',
                     selected: _view == _ExploreView.overview,
                     palette: palette,
                     onTap: () => setState(() => _view = _ExploreView.overview),
@@ -358,6 +380,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
                         saved: provider.isFavorite(place.id),
                         onFavorite: () => context.read<AppProvider>()
                             .toggleFavorite(place.id),
+                        onMap: () => _openLocation(place),
                         onTap: () => context.push('/place/${place.id}'),
                       );
                     },
@@ -367,11 +390,12 @@ class _ExploreScreenState extends State<ExploreScreen> {
             else
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 22),
-                child: _IllustrativeMap(
+                child: _DestinationLocations(
                   places: results,
                   ar: ar,
                   palette: palette,
                   onPlace: (place) => context.push('/place/${place.id}'),
+                  onMap: _openLocation,
                 ),
               ),
             const SizedBox(height: 26),
@@ -537,6 +561,7 @@ class _ExplorePlaceCard extends StatelessWidget {
     required this.isArabic,
     required this.saved,
     required this.onFavorite,
+    required this.onMap,
     required this.onTap,
   });
 
@@ -547,6 +572,7 @@ class _ExplorePlaceCard extends StatelessWidget {
   final bool isArabic;
   final bool saved;
   final VoidCallback onFavorite;
+  final VoidCallback onMap;
   final VoidCallback onTap;
 
   @override
@@ -576,6 +602,23 @@ class _ExplorePlaceCard extends StatelessWidget {
                             child: Icon(Icons.landscape_rounded,
                                 color: palette.accent, size: 45),
                           )),
+                      Positioned(
+                        top: 9,
+                        left: 9,
+                        child: Material(
+                          color: Colors.white.withValues(alpha: .96),
+                          shape: const CircleBorder(),
+                          child: IconButton(
+                            key: Key('explore_map_${place.id}'),
+                            tooltip: isArabic ? 'فتح خرائط Google' : 'Open Google Maps',
+                            constraints: const BoxConstraints(minWidth: 36, minHeight: 36),
+                            padding: const EdgeInsets.all(7),
+                            iconSize: 19,
+                            onPressed: onMap,
+                            icon: const Icon(Icons.map_outlined, color: Color(0xFF5B524B)),
+                          ),
+                        ),
+                      ),
                       Positioned(
                         top: 9,
                         right: 9,
@@ -689,162 +732,157 @@ class _EmptyPlaces extends StatelessWidget {
       );
 }
 
-/// A *schematic* location overview using approximate geographical coordinates.
-/// Not a road map or live Mapbox rendering; no invented routes or travel times.
-class _IllustrativeMap extends StatelessWidget {
-  const _IllustrativeMap({
+
+/// Location directory for all selected destinations.
+///
+/// This replaces the former illustrative map with outdated IDs. Each entry
+/// opens a real Google Maps search, or a government-sourced site point when
+/// available; names and images remain visible without a map service.
+class _DestinationLocations extends StatelessWidget {
+  const _DestinationLocations({
     required this.places,
     required this.ar,
     required this.palette,
     required this.onPlace,
+    required this.onMap,
   });
 
   final List<Place> places;
   final bool ar;
   final _ExplorePalette palette;
   final ValueChanged<Place> onPlace;
-
-  // Approximate positions, only to orient the demo; validated map data later.
-  static const coordinates = <String, (double, double)>{
-    'petra': (30.3285, 35.4444),
-    'jerash': (32.2747, 35.8912),
-    'wadi-rum': (29.5761, 35.4197),
-    'dead-sea': (31.56, 35.48),
-  };
+  final ValueChanged<Place> onMap;
 
   @override
-  Widget build(BuildContext context) => Container(
-        decoration: BoxDecoration(
-          color: const Color(0xFFE5DECC),
-          borderRadius: BorderRadius.circular(21),
-          border: Border.all(color: palette.border),
+  Widget build(BuildContext context) {
+    final groups = <String, List<Place>>{};
+    for (final place in places) {
+      final governorate = place.location.split(' Governorate').first.trim();
+      groups.putIfAbsent(governorate, () => <Place>[]).add(place);
+    }
+    final regions = groups.keys.toList()..sort();
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Container(
+          padding: const EdgeInsets.all(17),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(18),
+            color: palette.accent.withValues(alpha: .09),
+            border: Border.all(color: palette.accent.withValues(alpha: .20)),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                ar
+                    ? '${places.length} موقعاً في ${regions.length} محافظات'
+                    : '${places.length} locations across ${regions.length} governorates',
+                style: TextStyle(
+                  fontWeight: FontWeight.w800,
+                  fontSize: 17,
+                  color: palette.ink,
+                ),
+              ),
+              const SizedBox(height: 6),
+              Text(
+                ar
+                    ? 'اضغط رمز الخريطة لفتح الموقع في خرائط Google. بعض الأماكن لا تملك إحداثيات مدخل موثقة؛ تحقق من النتيجة قبل السفر.'
+                    : 'Tap the map icon to open Google Maps. Many places lack verified entrance coordinates, so check the search result before traveling.',
+                style: TextStyle(
+                  color: palette.muted,
+                  fontSize: 12,
+                  height: 1.5,
+                ),
+              ),
+            ],
+          ),
         ),
-        child: Column(
-          children: [
-            SizedBox(
-              height: 350,
-              child: LayoutBuilder(
-                builder: (context, area) => ClipRRect(
-                  borderRadius: const BorderRadius.vertical(
-                      top: Radius.circular(21)),
-                  child: Stack(
-                    children: [
-                      Positioned.fill(
-                        child: CustomPaint(painter: _MapTerrainPainter()),
-                      ),
-                      Positioned(
-                        top: 16, left: 16,
-                        child: Text(ar ? 'الأردن' : 'JORDAN',
-                          style: const TextStyle(color: Color(0xFF8C765D),
-                              letterSpacing: 2.5, fontSize: 11,
-                              fontWeight: FontWeight.w900)),
-                      ),
-                      ...places.map((place) {
-                        final position = coordinates[place.id];
-                        if (position == null) return const SizedBox.shrink();
-                        // Normalized longitude/latitude within a Jordan view box.
-                        final x = .17 + ((position.$2 - 35.3) / 1.0) * .60;
-                        final y = .13 + ((32.7 - position.$1) / 3.5) * .73;
-                        return Positioned(
-                          left: (area.maxWidth * x - 46).clamp(0,
-                              (area.maxWidth - 92).clamp(0.0, double.infinity)).toDouble(),
-                          top: (area.maxHeight * y - 25).clamp(0,
-                              (area.maxHeight - 66).clamp(0.0, double.infinity)).toDouble(),
-                          child: GestureDetector(
-                            key: Key('explore_map_pin_${place.id}'),
-                            onTap: () => onPlace(place),
-                            child: Column(
-                              children: [
-                                Container(
-                                  width: 34, height: 34,
-                                  decoration: BoxDecoration(
-                                    color: palette.accent,
-                                    shape: BoxShape.circle,
-                                    border: Border.all(color: Colors.white, width: 3),
-                                    boxShadow: const [BoxShadow(
-                                      color: Color(0x33000000), blurRadius: 10,
-                                      offset: Offset(0, 4))],
-                                  ),
-                                  child: const Icon(Icons.place,
-                                      color: Colors.white, size: 18),
-                                ),
-                                const SizedBox(height: 5),
-                                Container(
-                                  constraints: const BoxConstraints(maxWidth: 92),
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 7, vertical: 4),
-                                  decoration: BoxDecoration(
-                                    color: const Color(0xFFFBF9F5),
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                  child: Text(ar ? place.nameAr : place.name,
-                                    maxLines: 1, overflow: TextOverflow.ellipsis,
-                                    textAlign: TextAlign.center,
-                                    style: const TextStyle(fontWeight: FontWeight.w800,
-                                        fontSize: 10.5, color: Color(0xFF3D342C))),
-                                ),
-                              ],
-                            ),
-                          ),
-                        );
-                      }),
-                    ],
+        const SizedBox(height: 18),
+        for (final region in regions) ...[
+          Padding(
+            padding: const EdgeInsets.fromLTRB(3, 10, 3, 10),
+            child: Row(
+              children: [
+                Icon(Icons.place_outlined, color: palette.accent, size: 20),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    region,
+                    style: TextStyle(
+                      color: palette.ink,
+                      fontSize: 18,
+                      fontWeight: FontWeight.w800,
+                    ),
                   ),
+                ),
+                Text('${groups[region]!.length}',
+                    style: TextStyle(color: palette.muted)),
+              ],
+            ),
+          ),
+          for (final place in groups[region]!)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 9),
+              child: Material(
+                color: palette.card,
+                borderRadius: BorderRadius.circular(15),
+                child: ListTile(
+                  key: Key('location_item_${place.id}'),
+                  shape: RoundedRectangleBorder(
+                    side: BorderSide(color: palette.border),
+                    borderRadius: BorderRadius.circular(15),
+                  ),
+                  contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 10, vertical: 6),
+                  leading: ClipRRect(
+                    borderRadius: BorderRadius.circular(10),
+                    child: SizedBox(
+                      height: 54,
+                      width: 60,
+                      child: Image.asset(
+                        place.imageUrl,
+                        fit: BoxFit.cover,
+                        errorBuilder: (_, __, ___) => ColoredBox(
+                          color: palette.accent.withValues(alpha: .14),
+                          child: Icon(
+                            Icons.landscape_outlined,
+                            color: palette.accent,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  title: Text(
+                    ar ? place.nameAr : place.name,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      color: palette.ink,
+                      fontWeight: FontWeight.w700,
+                      fontSize: 13,
+                    ),
+                  ),
+                  subtitle: Text(
+                    ar ? place.locationAr : place.location,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(color: palette.muted, fontSize: 11),
+                  ),
+                  trailing: IconButton(
+                    key: Key('location_map_${place.id}'),
+                    tooltip: ar ? 'البحث في خرائط Google' : 'Find on Google Maps',
+                    onPressed: () => onMap(place),
+                    icon: Icon(Icons.map_outlined, color: palette.accent),
+                  ),
+                  onTap: () => onPlace(place),
                 ),
               ),
             ),
-            Padding(
-              padding: const EdgeInsets.all(14),
-              child: Row(
-                children: [
-                  Icon(Icons.info_outline_rounded,
-                      size: 17, color: palette.muted),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: Text(
-                      ar ? 'عرض توضيحي تقريبي — سنضيف Mapbox لاحقاً'
-                          : 'Illustrative overview · Mapbox integration later',
-                      style: TextStyle(color: palette.muted, fontSize: 11.5),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      );
-}
-
-class _MapTerrainPainter extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    final faint = Paint()
-      ..color = const Color(0x40FFFFFF)
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 1.5;
-    for (var i = 0; i < 8; i++) {
-      final startY = i * size.height / 7;
-      final path = Path()
-        ..moveTo(-10, startY)
-        ..cubicTo(size.width * .3, startY - 42,
-            size.width * .65, startY + 55, size.width + 20, startY - 15);
-      canvas.drawPath(path, faint);
-    }
-    final lake = Paint()..color = const Color(0x336CA4B3);
-    canvas.drawOval(Rect.fromLTWH(size.width * .18,
-        size.height * .28, size.width * .12, size.height * .23), lake);
-    final tracks = Paint()
-      ..color = const Color(0x559B856C)
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 2;
-    final path = Path()
-      ..moveTo(size.width * .8, -10)
-      ..cubicTo(size.width * .35, size.height * .25,
-          size.width * .7, size.height * .61,
-          size.width * .34, size.height + 20);
-    canvas.drawPath(path, tracks);
+          const SizedBox(height: 12),
+        ],
+      ],
+    );
   }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }

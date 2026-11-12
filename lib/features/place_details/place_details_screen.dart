@@ -7,6 +7,7 @@ import '../../core/providers/app_provider.dart';
 import '../../data/content/destination_guides.dart';
 import '../../data/media/place_photo_credits.dart';
 import '../../data/mock/jordan_place_seed.dart';
+import '../../data/services/place_map_links.dart';
 import '../../data/models/models.dart';
 import '../../data/repositories/place_visit_facts_repository.dart';
 import '../ai_planner/jordan_price_catalog.dart';
@@ -573,18 +574,9 @@ String _categoryLabel(String category, bool ar) => switch (category) {
 
 Future<void> _openMaps(
     BuildContext context, Place place, {required bool directions}) async {
-  // Fall back to a name search unless official site-point coordinates exist.
-  // A recorded site point may NOT be the accessible entrance gate.
-  final facts = PlaceVisitFactsRepository.forId(place.id);
-  final query = facts?.hasSourcedCoordinates == true &&
-          facts?.gpsPrecision == 'site_point'
-      ? '${facts!.gpsLat},${facts.gpsLon}'
-      : '${place.name}, Jordan';
   final url = directions
-      ? Uri.https('www.google.com', '/maps/dir/',
-          {'api': '1', 'destination': query})
-      : Uri.https('www.google.com', '/maps/search/',
-          {'api': '1', 'query': query});
+      ? PlaceMapLinks.directions(place)
+      : PlaceMapLinks.search(place);
   await _openExternal(context, url);
 }
 
