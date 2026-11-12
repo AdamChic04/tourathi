@@ -7,6 +7,7 @@ import 'core/auth/auth_router_refresh.dart';
 import 'core/providers/app_provider.dart';
 import 'core/router/app_router.dart';
 import 'core/theme/app_theme.dart';
+import 'core/widgets/tourathi_brand_mark.dart';
 
 class TouRathiApp extends StatefulWidget {
   const TouRathiApp({super.key});
@@ -59,7 +60,15 @@ class _TouRathiAppState extends State<TouRathiApp> {
             builder: (context, child) {
               return Directionality(
                 textDirection: app.isArabic ? TextDirection.rtl : TextDirection.ltr,
-                child: child ?? const SizedBox.shrink(),
+                child: Stack(
+                  fit: StackFit.expand,
+                  children: [
+                    child ?? const SizedBox.shrink(),
+                    const Positioned.fill(
+                      child: TouRathiBrandWatermark(opacity: 0.09),
+                    ),
+                  ],
+                ),
               );
             },
           );
