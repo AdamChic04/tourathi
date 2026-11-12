@@ -101,7 +101,7 @@ class TouRathiBrandWatermark extends StatelessWidget {
                 opacity: opacity,
                 child: SizedBox(
                   width: 330,
-                  height: 305,
+                  height: 365,
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
