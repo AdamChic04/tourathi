@@ -4,8 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_typography.dart';
+import '../../core/widgets/tourathi_brand_mark.dart';
 
 /// Animated launch screen.
 ///
@@ -114,50 +114,11 @@ class _SplashScreenState extends State<SplashScreen>
                             offset: Offset(0, (1 - logoIn) * 28),
                             child: Transform.scale(
                               scale: 0.60 + (0.40 * easedLogo),
-                              child: SizedBox(
-                                width: 190,
-                                height: 190,
-                                child: Stack(
-                                  alignment: Alignment.center,
-                                  children: [
-                                    Transform.rotate(
-                                      angle: (_ambient.value * math.pi * 2) / 3,
-                                      child: CustomPaint(
-                                        size: const Size(190, 190),
-                                        painter: _CompassOrbitPainter(),
-                                      ),
-                                    ),
-                                    Container(
-                                      width: 133,
-                                      height: 133,
-                                      decoration: BoxDecoration(
-                                        shape: BoxShape.circle,
-                                        gradient: AppColors.goldShimmer,
-                                        border: Border.all(
-                                          width: 1.2,
-                                          color: Colors.white.withValues(alpha: 0.45),
-                                        ),
-                                        boxShadow: [
-                                          BoxShadow(
-                                            color: AppColors.desertGold.withValues(
-                                              alpha: 0.21 + 0.17 * glow,
-                                            ),
-                                            blurRadius: 25 + 17 * glow,
-                                            spreadRadius: 2 + 7 * glow,
-                                          ),
-                                        ],
-                                      ),
-                                      child: Transform.rotate(
-                                        angle: (1 - logoIn) * -0.38,
-                                        child: const Icon(
-                                          Icons.explore_rounded,
-                                          size: 79,
-                                          color: Colors.white,
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
+                              child: TouRathiCompassMark(
+                                size: 190,
+                                orbitAngle: (_ambient.value * math.pi * 2) / 3,
+                                iconAngle: (1 - logoIn) * -0.38,
+                                glow: glow,
                               ),
                             ),
                           ),
@@ -260,47 +221,6 @@ class _SplashScreenState extends State<SplashScreen>
       ),
     );
   }
-}
-
-class _CompassOrbitPainter extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    final center = Offset(size.width / 2, size.height / 2);
-    final radius = size.width / 2 - 4;
-    final ring = Paint()
-      ..color = const Color(0xFFE9D0AA).withValues(alpha: 0.55)
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 1.3;
-    canvas.drawCircle(center, radius, ring);
-
-    final arc = Paint()
-      ..color = const Color(0xFFFFE4B5).withValues(alpha: 0.94)
-      ..style = PaintingStyle.stroke
-      ..strokeCap = StrokeCap.round
-      ..strokeWidth = 3;
-    canvas.drawArc(
-      Rect.fromCircle(center: center, radius: radius),
-      -math.pi / 3,
-      math.pi / 3,
-      false,
-      arc,
-    );
-
-    for (var i = 0; i < 4; i++) {
-      final angle = i * math.pi / 2;
-      canvas.drawCircle(
-        Offset(
-          center.dx + math.cos(angle) * radius,
-          center.dy + math.sin(angle) * radius,
-        ),
-        i == 0 ? 4 : 2.2,
-        Paint()..color = const Color(0xFFF9DFA8),
-      );
-    }
-  }
-
-  @override
-  bool shouldRepaint(covariant _CompassOrbitPainter oldDelegate) => false;
 }
 
 class _SandAndStarsPainter extends CustomPainter {

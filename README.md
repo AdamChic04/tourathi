@@ -87,3 +87,17 @@ The animated splash opens Login for signed-out visitors and Home for signed-in u
 - `assets/images/home/`: four locally bundled illustrative destination visuals
 
 **Milestone:** Flutter UI plus Supabase email/password authentication. There is not yet a role-specific admin or organizer portal. Flutter build and device testing should be performed on the developer's computer.
+
+
+## Background brand watermark
+
+TouRathi reuses its **existing animated splash compass mark and TouRathi
+wordmark** as a static, 9%-opacity watermark across app screens, including
+auth, Home, Explore, destination pages, and the itinerary planner. This is
+implemented in `lib/core/widgets/tourathi_brand_mark.dart` and applied by
+the `MaterialApp.router` builder in `lib/app.dart`.
+
+The watermark is non-interactive (`IgnorePointer`) and ignored by accessibility
+semantics (`ExcludeSemantics`), while the splash keeps its original entrance
+animation. **It does not require an external logo image or change the brand
+mark**. No separate official PNG/SVG logo is stored in this repository.
