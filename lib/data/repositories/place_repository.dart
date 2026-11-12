@@ -31,7 +31,10 @@ class PlaceRepository {
       descriptionAr: row['description_ar'] as String? ?? '',
       location: '$governorate Governorate, Jordan',
       locationAr: 'محافظة $governorate، الأردن',
-      imageUrl: row['image_asset'] as String? ?? '',
+      // Images are bundled Flutter assets; don't depend on remote URLs.
+      imageUrl: (row['image_asset'] as String?)?.isNotEmpty == true
+          ? row['image_asset'] as String
+          : "assets/images/places/${row['id']}.jpg",
       rating: 0, // No verified review data has been imported.
       category: row['category'] as String,
       discoveryTier:

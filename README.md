@@ -50,6 +50,16 @@ The existing wizard, saved plans, local itinerary generator, and optional Cloudf
 
 See [the AI Planner Worker README](workers/ai-planner/README.md) for deployment details.
 
+## All 61 destinations, images, and locations
+
+**Home** now retains four curated large hero photos but the "All Jordan destinations" list includes all 61 photos and places. Tap **See all 61** to open **Explore**, where the default grid displays every one of the 61 place cards with its bundled photograph. Category, search and saved-only filters narrow the current selection.
+
+The **Locations** view in Explore replaces a broken illustrative map whose outdated IDs never matched the dataset. It groups the full collection by Jordan's 12 governorates with photos and individual **Google Maps** actions. Where a government-published **site point** is available it can be sent to Google Maps; otherwise Maps searches by place and governorate. UNESCO heritage-area reference points are *not* visitor entrance points. Exact location data is not yet verified for all 61 entries, so this is a directory with real map links, not an interactive 61-pin map. Do not claim otherwise.
+
+**Image transparency:** 61 JPEG assets are bundled in `assets/images/places/`, one per destination, with [attribution](assets/images/places/ATTRIBUTION.md). Some photos illustrate a region rather than the exact landmark. A partial Supabase catalog response cannot overwrite the full bundled list.
+
+To update an existing checkout, run `git pull origin main`, `flutter pub get`, and `flutter run -d chrome --web-port=5173`. Save/commit any local changes before pulling. Use a hard refresh (Ctrl+Shift+R) if your browser has cached a previous Flutter web build.
+
 ## Not implemented yet
 
 Organizer/seller/admin portals, AI image/video generator, AR, full maps/navigation, marketplace, group chat, and bookings. Authentication and the secure user profile/role tables are now connected to Supabase. Visible shortcut buttons for upcoming features lead to an explicit **Coming soon** screen.

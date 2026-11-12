@@ -98,9 +98,14 @@ class JordanPlaceSeed {
   /// Loaded from Supabase after successful authentication. Fallback remains
   /// available if the network or database is temporarily unreachable.
   static void setRemotePlaces(List<Place> records) {
-    if (records.isNotEmpty) {
-      _remotePlaces = List<Place>.unmodifiable(records);
-    }
+    if (records.isEmpty) return;
+    final remoteById = {for (final place in records) place.id: place};
+    // Merge by the stable 61 owner-supplied IDs. A partial server response
+    // must never make photos or destinations disappear from the app.
+    _remotePlaces = List<Place>.unmodifiable([
+      for (final fallback in _offlinePlaces)
+        remoteById[fallback.id] ?? fallback,
+    ]);
   }
 
   static List<String> get categories =>

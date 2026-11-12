@@ -32,7 +32,11 @@ class _HomeScreenState extends State<HomeScreen> {
   Timer? _slideTimer;
   int _slide = 0;
 
-  List<Place> get _places => JordanPlaceSeed.places
+  /// Full catalog for the scrolling destination list.
+  List<Place> get _places => JordanPlaceSeed.places;
+
+  /// Keep the hero carousel curated without hiding the rest of Jordan.
+  List<Place> get _featuredPlaces => JordanPlaceSeed.places
       .where((place) => _photos.containsKey(place.id))
       .toList(growable: false);
 
@@ -41,10 +45,10 @@ class _HomeScreenState extends State<HomeScreen> {
     super.initState();
     _carouselController = PageController();
     _slideTimer = Timer.periodic(const Duration(seconds: 5), (_) {
-      if (!mounted || !_carouselController.hasClients || _places.isEmpty) {
+      if (!mounted || !_carouselController.hasClients || _featuredPlaces.isEmpty) {
         return;
       }
-      final next = (_slide + 1) % _places.length;
+      final next = (_slide + 1) % _featuredPlaces.length;
       _carouselController.animateToPage(
         next,
         duration: const Duration(milliseconds: 650),
@@ -73,6 +77,7 @@ class _HomeScreenState extends State<HomeScreen> {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final palette = _HomePalette(isDark);
     final places = _places;
+    final featuredPlaces = _featuredPlaces;
 
     return Scaffold(
       backgroundColor: palette.background,
@@ -208,10 +213,10 @@ class _HomeScreenState extends State<HomeScreen> {
               child: PageView.builder(
                 key: const Key('home_featured_carousel'),
                 controller: _carouselController,
-                itemCount: places.length,
+                itemCount: featuredPlaces.length,
                 onPageChanged: (index) => setState(() => _slide = index),
                 itemBuilder: (context, index) {
-                  final place = places[index];
+                  final place = featuredPlaces[index];
                   return Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 22),
                     child: _HeroSlide(
@@ -227,7 +232,7 @@ class _HomeScreenState extends State<HomeScreen> {
             const SizedBox(height: 15),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
-              children: List.generate(places.length, (index) {
+              children: List.generate(featuredPlaces.length, (index) {
                 final active = _slide == index;
                 return GestureDetector(
                   key: Key('home_dot_$index'),
@@ -306,7 +311,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 children: [
                   Expanded(
                     child: Text(
-                      isArabic ? 'أماكن مميزة' : 'Popular destinations',
+                      isArabic ? 'جميع وجهات الأردن' : 'All Jordan destinations',
                       style: TextStyle(color: palette.ink, fontWeight: FontWeight.w800, fontSize: 19),
                     ),
                   ),
@@ -314,7 +319,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     key: const Key('home_see_all_button'),
                     onPressed: _explore,
                     child: Text(
-                      isArabic ? 'عرض الكل' : 'See all',
+                      isArabic ? 'عرض ${places.length} مكانًا' : 'See all ${places.length}',
                       style: TextStyle(color: palette.accent, fontWeight: FontWeight.w700, fontSize: 13),
                     ),
                   ),
@@ -334,7 +339,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   return _DestinationCard(
                     key: Key('home_place_${place.id}'),
                     place: place,
-                    photo: _photos[place.id]!,
+                    photo: place.imageUrl,
                     isArabic: isArabic,
                     palette: palette,
                     saved: context.watch<AppProvider>().isFavorite(place.id),
@@ -417,7 +422,13 @@ class _HeroSlide extends StatelessWidget {
           child: Stack(
             fit: StackFit.expand,
             children: [
-              Image.asset(photo, fit: BoxFit.cover),
+              Image.asset(photo,
+                 fit: BoxFit.cover,
+                 errorBuilder: (_, __, ___) => const ColoredBox(
+                   color: Color(0xFF79543C),
+                   child: Center(child: Icon(Icons.landscape_outlined,
+                     color: Colors.white70, size: 38)),
+                 )),
               const DecoratedBox(
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
@@ -551,7 +562,13 @@ class _DestinationCard extends StatelessWidget {
                     child: Stack(
                       fit: StackFit.expand,
                       children: [
-                        Image.asset(photo, fit: BoxFit.cover),
+                        Image.asset(photo,
+                           fit: BoxFit.cover,
+                           errorBuilder: (_, __, ___) => const ColoredBox(
+                             color: Color(0xFF79543C),
+                             child: Center(child: Icon(Icons.landscape_outlined,
+                                 color: Colors.white70, size: 32)),
+                           )),
                         Positioned(
                           right: 10,
                           top: 10,
@@ -601,12 +618,8 @@ class _DestinationCard extends StatelessWidget {
                               style: TextStyle(color: palette.muted, fontSize: 11),
                             ),
                           ),
-                          const Icon(Icons.star_rounded, color: Color(0xFFD9A047), size: 14),
-                          const SizedBox(width: 3),
-                          Text(
-                            place.rating.toStringAsFixed(1),
-                            style: TextStyle(color: palette.ink, fontSize: 11, fontWeight: FontWeight.w700),
-                          ),
+                          // No public visitor ratings have been imported yet.
+                          // Avoid showing a misleading "0.0 stars" score.
                         ],
                       ),
                     ],
