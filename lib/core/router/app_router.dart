@@ -13,6 +13,7 @@ import '../../features/place_details/place_details_screen.dart';
 import '../../features/coming_soon/coming_soon_screen.dart';
 import '../../features/ai_planner/ai_planner_screen.dart';
 import '../../features/ai_planner/my_plans_screen.dart';
+import '../../features/ai_planner/saved_plans_store.dart';
 
 class AppRouter {
   AppRouter._();
@@ -89,7 +90,11 @@ class AppRouter {
       ),
       GoRoute(
         path: '/ai-planner',
-        builder: (context, state) => const AiPlannerScreen(),
+        builder: (context, state) => AiPlannerScreen(
+          initialPlan: state.extra is SavedPlanRecord
+              ? state.extra! as SavedPlanRecord
+              : null,
+        ),
       ),
       GoRoute(
         path: '/my-plans',

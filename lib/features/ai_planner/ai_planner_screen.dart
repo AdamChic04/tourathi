@@ -7,7 +7,6 @@ import '../../core/providers/app_provider.dart';
 import '../../core/theme/app_colors.dart';
 import '../../data/mock/jordan_place_seed.dart';
 import '../../data/models/models.dart';
-import '../../data/repositories/place_visit_facts_repository.dart';
 import 'jordan_price_catalog.dart';
 import 'jordan_visit_info.dart';
 import 'saved_plans_store.dart';
@@ -55,7 +54,6 @@ class _TripPlan {
     required this.daysCount,
     required this.additionalRequests,
     required this.alternatives,
-    required this.unpricedPlaceIds,
   });
 
   final List<_PlannerDay> days;
@@ -80,8 +78,6 @@ class _TripPlan {
   final int daysCount;
   final String additionalRequests;
   final List<Place> alternatives;
-  final List<String> unpricedPlaceIds;
-  bool get hasUnknownCosts => unpricedPlaceIds.isNotEmpty;
 }
 
 /// A local itinerary optimizer. The source catalog has no live prices,
@@ -170,7 +166,6 @@ class _AiPlannerScreenState extends State<AiPlannerScreen> {
         daysCount: saved.daysCount,
         additionalRequests: saved.additionalRequests,
         alternatives: const [],
-        unpricedPlaceIds: saved.unpricedPlaceIds,
       );
       _step = 6;
       _intro = false;
@@ -330,7 +325,6 @@ class _AiPlannerScreenState extends State<AiPlannerScreen> {
           daysCount: request.days,
           additionalRequests: request.additionalRequests,
           alternatives: generated.alternatives,
-          unpricedPlaceIds: generated.unpricedPlaceIds,
         );
         _isBuilding = false;
         _step = 6;
@@ -1426,7 +1420,6 @@ class _AiPlannerScreenState extends State<AiPlannerScreen> {
         for (final place in plan.days.expand((day) => day.places))
           place.id: JordanPriceCatalog.forPlaceId(place.id).toJson(),
       },
-      unpricedPlaceIds: plan.unpricedPlaceIds,
       otherCostsAllowance: plan.otherCostsAllowance,
       additionalRequests: plan.additionalRequests,
       travelDate: plan.travelDate,
@@ -1681,15 +1674,15 @@ class _PlanResults extends StatelessWidget {
             children: [
               Text(
                 isArabic
-                    ? 'لا توجد وجهات مطابقة للشروط'
-                    : 'No matching destinations were scheduled',
+                    ? 'لا توجد أماكن تناسب هذه الميزانية'
+                    : 'No places fit this budget',
                 style: theme.textTheme.titleMedium,
               ),
               const SizedBox(height: 6),
               Text(
                 isArabic
-                    ? 'لم أجد وجهات مطابقة للشروط والتكاليف المنشورة. وسّع المنطقة أو الاهتمامات أو عدّل الميزانية.'
-                    : 'No destinations fit the selected preferences and published-cost limits. Widen the region or interests, or adjust the budget.',
+                    ? 'لم أجد أماكن ذات أسعار موثقة ضمن المبلغ المتاح بعد المخصصات. وسّع المنطقة أو الاهتمامات، أو ارفع الميزانية.'
+                    : 'No places with verified prices fit the remaining activity budget. Widen the area or interests, or increase the budget.',
               ),
               const SizedBox(height: 6),
               Text(plan.statusMessage, style: theme.textTheme.bodySmall),
@@ -1697,8 +1690,8 @@ class _PlanResults extends StatelessWidget {
                 const SizedBox(height: 10),
                 Text(
                   isArabic
-                      ? 'وجهات أخرى يمكنك استكشافها:'
-                      : 'Other destinations to consider:',
+                      ? 'أماكن بديلة لها سعر منشور في مناطق أخرى:'
+                      : 'Priced alternatives in other areas:',
                   style: theme.textTheme.titleSmall,
                 ),
                 for (final place in plan.alternatives.take(3))
@@ -1757,8 +1750,8 @@ class _PlanResults extends StatelessWidget {
                     Expanded(
                       child: Text(
                         isArabic
-                            ? 'مجموع رسوم الأنشطة المنشورة: ${money(plan.estimatedLow)}–${money(plan.estimatedHigh)}'
-                            : 'Published activity fee subtotal: ${money(plan.estimatedLow)}–${money(plan.estimatedHigh)}',
+                            ? 'أسعار الأنشطة المعروفة: ${money(plan.estimatedLow)}–${money(plan.estimatedHigh)}'
+                            : 'Known activity prices: ${money(plan.estimatedLow)}–${money(plan.estimatedHigh)}',
                         style: theme.textTheme.titleMedium,
                       ),
                     ),
@@ -1767,8 +1760,8 @@ class _PlanResults extends StatelessWidget {
                 const SizedBox(height: 4),
                 Text(
                   isArabic
-                      ? 'المكونات المعروفة فقط: ${money(modeledLow)}–${money(modeledHigh)}'
-                      : 'Known modeled components only: ${money(modeledLow)}–${money(modeledHigh)}',
+                      ? 'المكونات المقدّرة المتاحة: ${money(modeledLow)}–${money(modeledHigh)}'
+                      : 'Modeled components: ${money(modeledLow)}–${money(modeledHigh)}',
                 ),
                 if (plan.otherCostsAllowance > 0)
                   Text(
@@ -1783,20 +1776,6 @@ class _PlanResults extends StatelessWidget {
                         : 'Amman meals: ${money(mealLow)}–${money(mealHigh)}, assuming 3 inexpensive meals per person per day.',
                   ),
                 const SizedBox(height: 8),
-                if (plan.hasUnknownCosts)
-                  Padding(
-                    padding: const EdgeInsets.only(bottom: 10),
-                    child: Text(
-                      isArabic
-                          ? 'تنبيه: ${plan.unpricedPlaceIds.length} وجهات ذات أسعار غير معروفة. الأرقام أدناه ليست إجمالي تكلفة الرحلة ولا تعني أنها ضمن الميزانية.'
-                          : '${plan.unpricedPlaceIds.length} selected destinations have unknown costs. The shown subtotal is incomplete and does NOT guarantee that the trip fits the budget.',
-                      style: theme.textTheme.bodyMedium?.copyWith(
-                        color: theme.colorScheme.error,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                  ),
-                if (!plan.hasUnknownCosts)
                 ClipRRect(
                   borderRadius: BorderRadius.circular(8),
                   child: LinearProgressIndicator(
@@ -1911,7 +1890,6 @@ class _DayCard extends StatelessWidget {
               final price = JordanPriceCatalog.forPlaceId(place.id);
               final low = price.forVisitor(visitorClass) ?? price.low;
               final high = price.high ?? low;
-              final researched = PlaceVisitFactsRepository.forId(place.id);
               final visitInfo = JordanVisitInfoCatalog.forPlace(
                 place.id,
                 visitDate: date,
@@ -1944,11 +1922,7 @@ class _DayCard extends StatelessWidget {
                   Align(
                     alignment: AlignmentDirectional.centerStart,
                     child: Text(
-                      price.isVerified
-                          ? '${price.label} · ${price.unit} · ${price.checkedAt}'
-                          : (isArabic
-                              ? 'الرسوم غير متحققة. هذا لا يعني أن الدخول مجاني.'
-                              : 'Price unknown — not necessarily free.'),
+                      '${price.label} · ${price.unit} · ${price.checkedAt}',
                     ),
                   ),
                   const SizedBox(height: 4),
@@ -1976,27 +1950,7 @@ class _DayCard extends StatelessWidget {
                         ),
                       ),
                     ),
-                  if (researched?.hoursTextEn != null) ...[
-                    Align(
-                      alignment: AlignmentDirectional.centerStart,
-                      child: Text(
-                        isArabic
-                            ? (researched!.hoursTextAr ?? researched.hoursTextEn!)
-                            : researched!.hoursTextEn!,
-                      ),
-                    ),
-                    if (researched.hoursSourceUrl != null)
-                      TextButton.icon(
-                        onPressed: () => launchUrl(
-                          Uri.parse(researched.hoursSourceUrl!),
-                          mode: LaunchMode.externalApplication,
-                        ),
-                        icon: const Icon(Icons.open_in_new_rounded, size: 16),
-                        label: Text(
-                          isArabic ? 'مصدر الأوقات المنشورة' : 'Published hours source',
-                        ),
-                      ),
-                  ] else if (visitInfo != null) ...[
+                  if (visitInfo != null) ...[
                     Align(
                       alignment: AlignmentDirectional.centerStart,
                       child: Text(

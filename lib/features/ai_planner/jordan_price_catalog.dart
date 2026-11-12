@@ -1,5 +1,4 @@
 import '../../data/mock/jordan_place_seed.dart';
-import '../../data/repositories/place_visit_facts_repository.dart';
 
 enum VisitorRateClass { jordanian, resident, international, internationalDayVisitor }
 
@@ -503,41 +502,7 @@ class JordanPriceCatalog {
     'amman-jabal-luweibdeh': _byId['food-inexpensive']!,
   };
 
-  /// Prefer published Supabase admission/reserve fees for the selected
-  /// destination. Vehicle-only fees cannot be treated as per-person admission.
-  /// Local source-based references remain as an offline fallback.
-  static PriceEstimate forPlaceId(String id) {
-    final fact = PlaceVisitFactsRepository.forId(id);
-    if (fact != null && fact.admissionKind != null &&
-        fact.admissionKind != 'vehicle_entry' &&
-        fact.admissionSourceUrl != null &&
-        fact.admissionSourceUrl!.isNotEmpty &&
-        (fact.admissionJordanian != null ||
-         fact.admissionResident != null ||
-         fact.admissionInternational != null ||
-         fact.admissionDayVisitor != null)) {
-      return PriceEstimate(
-        id: id,
-        label: fact.admissionNameEn ?? 'Published admission reference',
-        unit: fact.admissionUnitEn ?? 'per person',
-        confidence: PriceConfidence.officialFixed,
-        sourceName: fact.admissionSourceName ?? 'Published source',
-        sourceUrl: fact.admissionSourceUrl!,
-        checkedAt: fact.admissionCheckedOn ?? '',
-        conditions: fact.admissionConditionsEn ??
-            'Check current admission conditions before traveling.',
-        jordanian: fact.admissionJordanian,
-        resident: fact.admissionResident,
-        international: fact.admissionInternational,
-        dayVisitor: fact.admissionDayVisitor,
-      );
-    }
-    if (fact?.admissionKind == 'vehicle_entry') {
-      // Do not invent a per-person cost from a vehicle admission reference.
-      return _unverified(id);
-    }
-    return _byPlace[id] ?? _unverified(id);
-  }
+  static PriceEstimate forPlaceId(String id) => _byPlace[id] ?? _unverified(id);
 
   static PriceEstimate get inexpensiveAmmanMeal =>
       _officialFees.firstWhere((estimate) => estimate.id == 'food-inexpensive');

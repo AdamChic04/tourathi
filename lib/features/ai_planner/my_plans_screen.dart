@@ -173,17 +173,10 @@ class _MyPlansScreenState extends State<MyPlansScreen> {
                           const SizedBox(height: 4),
                           Text(
                             isArabic
-                                ? '$stopCount أماكن · الرسوم المعروفة ${plan.estimatedLow.toStringAsFixed(0)}–${plan.estimatedHigh.toStringAsFixed(0)} د.أ'
-                                : '$stopCount places · known activity fees ${plan.estimatedLow.toStringAsFixed(0)}–${plan.estimatedHigh.toStringAsFixed(0)} JOD',
+                                ? '$stopCount أماكن · تقدير الأنشطة ${plan.estimatedLow.toStringAsFixed(0)}–${plan.estimatedHigh.toStringAsFixed(0)} د.أ'
+                                : '$stopCount places · activity estimate ${plan.estimatedLow.toStringAsFixed(0)}–${plan.estimatedHigh.toStringAsFixed(0)} JOD',
                             style: Theme.of(context).textTheme.bodySmall,
                           ),
-                          if (plan.unpricedPlaceIds.isNotEmpty)
-                            Text(
-                              isArabic
-                                ? '${plan.unpricedPlaceIds.length} وجهات بأسعار غير معروفة؛ الإجمالي غير مكتمل.'
-                                : '${plan.unpricedPlaceIds.length} unpriced stops — total cost unknown.',
-                              style: Theme.of(context).textTheme.bodySmall,
-                            ),
                           Align(
                             alignment: AlignmentDirectional.centerEnd,
                             child: TextButton.icon(
@@ -255,19 +248,6 @@ class _PlanDetailsSheet extends StatelessWidget {
                 ? 'تقدير الأنشطة: ${plan.estimatedLow.toStringAsFixed(2)}–${plan.estimatedHigh.toStringAsFixed(2)} د.أ'
                 : 'Activity estimate: ${plan.estimatedLow.toStringAsFixed(2)}–${plan.estimatedHigh.toStringAsFixed(2)} JOD',
           ),
-          if (plan.unpricedPlaceIds.isNotEmpty)
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 8),
-              child: Text(
-                isArabic
-                  ? 'تحذير: ${plan.unpricedPlaceIds.length} وجهات دون رسوم مؤكدة. هذا تقدير جزئي ولا يثبت أن الرحلة ضمن الميزانية.'
-                  : 'Cost warning: ${plan.unpricedPlaceIds.length} stops have unknown prices. These subtotals are incomplete and cannot confirm the trip budget.',
-                style: TextStyle(
-                  color: Theme.of(context).colorScheme.error,
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
-            ),
           if (plan.travelDate.isNotEmpty)
             Text(
               isArabic
