@@ -304,6 +304,61 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
             ),
+            const SizedBox(height: 15),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 22),
+              child: Material(
+                color: palette.card,
+                borderRadius: BorderRadius.circular(19),
+                child: InkWell(
+                  key: const Key('home_food_button'),
+                  borderRadius: BorderRadius.circular(19),
+                  onTap: () => widget.onSelectTab?.call(2),
+                  child: Container(
+                    padding: const EdgeInsets.all(18),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(19),
+                      border: Border.all(color: palette.border),
+                    ),
+                    child: Row(
+                      children: [
+                        Container(
+                          width: 51,
+                          height: 51,
+                          decoration: BoxDecoration(
+                            color: palette.accent.withValues(alpha: .12),
+                            borderRadius: BorderRadius.circular(15),
+                          ),
+                          child: Icon(Icons.restaurant_menu_rounded,
+                              color: palette.accent, size: 25),
+                        ),
+                        const SizedBox(width: 14),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                isArabic ? 'تذوّق الأردن' : 'Taste of Jordan',
+                                style: TextStyle(color: palette.ink,
+                                    fontWeight: FontWeight.w800, fontSize: 15),
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                isArabic ? 'أطباق وأسواق وتجارب محلية' :
+                                    'Discover dishes, markets and local culture',
+                                style: TextStyle(color: palette.muted,
+                                    fontSize: 12),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Icon(Icons.arrow_forward_rounded, color: palette.accent),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
             const SizedBox(height: 29),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 22),

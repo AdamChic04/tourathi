@@ -101,3 +101,23 @@ The watermark is non-interactive (`IgnorePointer`) and ignored by accessibility
 semantics (`ExcludeSemantics`), while the splash keeps its original entrance
 animation. **It does not require an external logo image or change the brand
 mark**. No separate official PNG/SVG logo is stored in this repository.
+
+## Taste of Jordan — Food & Culture page
+
+The **Food** tab is a new functional Flutter screen, also accessible through the
+Home shortcut and `/food`. It introduces six well-known dishes enjoyed in
+Jordan (Mansaf, Maqluba, Falafel, Knafeh, Zarb, and Galayet Bandora).
+
+Below the dish highlights, visitors can search and filter **seven existing**
+`category: food` entries from the 61-place catalog: Downtown Amman markets,
+Jabal Al Lweibdeh, Iraq Al Amir women's cooperative, Sakib, Rasoun,
+Madaba mosaic workshops, and Disi village/farms. The app displays their existing
+bundled photos, Arabic/English names and descriptions, governorate,
+session-only favorites, and links to the existing destination detail pages.
+
+These seven entries represent a **mix of markets, neighborhoods, villages,
+farms, and craft/community experiences**; they are *not* seven restaurants.
+No unverified dining establishments, bookings, menus, prices, or opening
+hours are asserted. Cuisine highlights are educational cards, not restaurant
+listings. Existing source/attribution notes remain in
+`assets/images/places/ATTRIBUTION.md`.
