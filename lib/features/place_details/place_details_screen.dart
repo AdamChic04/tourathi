@@ -58,7 +58,6 @@ class PlaceDetailsScreen extends StatelessWidget {
         : (p.description.contains('discovery record')
             ? guide?.en ?? p.description
             : p.description);
-    final region = p.location.split(',').first.trim();
     final sameGovernorate = JordanPlaceSeed.places
         .where((other) => other.id != p.id && other.location == p.location)
         .take(4)

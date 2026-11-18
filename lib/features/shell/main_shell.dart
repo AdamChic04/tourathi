@@ -4,8 +4,9 @@ import 'package:provider/provider.dart';
 import '../../core/providers/app_provider.dart';
 import '../home/home_screen.dart';
 import '../explore/explore_screen.dart';
+import '../rewards/adventure_rewards_screen.dart';
 
-/// Only the two implemented feature pages appear in the navigation.
+/// Primary app sections use the persistent bottom navigation.
 class MainShell extends StatefulWidget {
   const MainShell({super.key});
 
@@ -33,6 +34,7 @@ class _MainShellState extends State<MainShell> {
         children: [
           HomeScreen(onSelectTab: (tab) => setState(() => _index = tab)),
           const ExploreScreen(),
+          const AdventureRewardsScreen(),
         ],
       ),
       bottomNavigationBar: BottomNavigationBar(
@@ -49,6 +51,11 @@ class _MainShellState extends State<MainShell> {
             icon: const Icon(Icons.explore_outlined),
             activeIcon: const Icon(Icons.explore_rounded),
             label: arabic ? 'استكشف' : 'Explore',
+          ),
+          BottomNavigationBarItem(
+            icon: const Icon(Icons.stars_outlined),
+            activeIcon: const Icon(Icons.stars_rounded),
+            label: arabic ? 'المكافآت' : 'Rewards',
           ),
         ],
       ),

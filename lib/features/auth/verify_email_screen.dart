@@ -22,8 +22,10 @@ class _VerifyEmailScreenState extends State<VerifyEmailScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Verification email requested. Check your inbox.')));
     } on AuthException catch (e) {
-      if (mounted) ScaffoldMessenger.of(context)
-        .showSnackBar(SnackBar(content: Text(e.message)));
+      if (mounted) {
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text(e.message)));
+      }
     } finally {
       if (mounted) setState(() => _sending = false);
     }

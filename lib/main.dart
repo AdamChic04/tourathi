@@ -9,7 +9,7 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Supabase.initialize(
     url: SupabaseConfig.url,
-    anonKey: SupabaseConfig.publishableKey,
+    publishableKey: SupabaseConfig.publishableKey,
   );
   SystemChrome.setSystemUIOverlayStyle(
     const SystemUiOverlayStyle(statusBarColor: Colors.transparent),

@@ -14,6 +14,8 @@ import '../../features/coming_soon/coming_soon_screen.dart';
 import '../../features/ai_planner/ai_planner_screen.dart';
 import '../../features/ai_planner/my_plans_screen.dart';
 import '../../features/ai_planner/saved_plans_store.dart';
+import '../../features/rewards/adventure_rewards_screen.dart';
+import '../../features/social_journal/travel_journal_screen.dart';
 
 class AppRouter {
   AppRouter._();
@@ -107,8 +109,11 @@ class AppRouter {
       ),
       GoRoute(
         path: '/social-journal',
-        builder: (context, state) =>
-            const ComingSoonScreen(feature: 'Travel Journal'),
+        builder: (context, state) => const TravelJournalScreen(),
+      ),
+      GoRoute(
+        path: '/rewards',
+        builder: (context, state) => const AdventureRewardsScreen(),
       ),
       GoRoute(
         path: '/profile',

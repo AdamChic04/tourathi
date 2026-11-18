@@ -8,6 +8,7 @@ This repository contains **only the TouRathi screens developed so far**, not the
 - Clean Home screen with four automatically sliding destination visuals, search shortcut, destination cards and favorites.
 - Redesigned Explore Jordan screen with search, categories, sorting, favorites, and an illustrative (non-live) map overview.
 - Simple destination-details screen and working Home / Explore navigation.
+- Adventure Rewards with signed-in-user-scoped local points, a QR loyalty card, sample rewards, and completed-trip journaling.
 - English and Arabic labels, light / dark theme foundations.
 
 The catalog contains 61 destinations in 12 governorates, with 61 bundled licensed images. Image sources and reuse terms are documented in [image attributions](assets/images/places/ATTRIBUTION.md); some are regional representative images, not exact-site photographs. Place descriptions are prototype text, and ratings are unavailable. Favorites currently last only while the app is running.
@@ -62,7 +63,7 @@ To update an existing checkout, run `git pull origin main`, `flutter pub get`, a
 
 ## Not implemented yet
 
-Organizer/seller/admin portals, AI image/video generator, AR, full maps/navigation, marketplace, group chat, and bookings. Authentication and the secure user profile/role tables are now connected to Supabase. Visible shortcut buttons for upcoming features lead to an explicit **Coming soon** screen.
+Organizer/seller/admin portals, AI image/video generator, AR, full maps/navigation, marketplace, group chat, bookings, and a server-side rewards/partner fulfillment backend. Authentication and the secure user profile/role tables are connected to Supabase. Adventure Rewards currently stores balances locally per signed-in user on each installation; it does not sync between devices and sample redemptions are not partner-fulfilled.
 
 ## Run
 
@@ -81,6 +82,8 @@ The animated splash opens Login for signed-out visitors and Home for signed-in u
 - `lib/features/home/`: Home
 - `lib/features/explore/`: Explore Jordan
 - `lib/features/place_details/`: destination preview
+- `lib/features/rewards/`: Adventure Rewards catalog, models, screen and local repository
+- `lib/features/social_journal/`: completed-trip journal used for earning points
 - `lib/features/coming_soon/`: honest placeholders
 - `lib/core/`: routing, theme and session state
 - `lib/data/`: small sample destination model and records

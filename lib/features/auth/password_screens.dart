@@ -27,11 +27,16 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
         _email.text.trim(), redirectTo: AuthRedirects.passwordReset);
       if (mounted) setState(() => _sent = true);
     } on AuthException catch (e) {
-      if (mounted) ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text(e.message)));
+      if (mounted) {
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text(e.message)));
+      }
     } catch (_) {
-      if (mounted) ScaffoldMessenger.of(context)
-          .showSnackBar(const SnackBar(content: Text('Request failed. Try again.')));
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Request failed. Try again.')),
+        );
+      }
     } finally {
       if (mounted) setState(() => _working = false);
     }
@@ -116,11 +121,16 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
         context.go('/login');
       }
     } on AuthException catch (e) {
-      if (mounted) ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text(e.message)));
+      if (mounted) {
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text(e.message)));
+      }
     } catch (_) {
-      if (mounted) ScaffoldMessenger.of(context)
-          .showSnackBar(const SnackBar(content: Text('Could not update password.')));
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Could not update password.')),
+        );
+      }
     } finally {
       if (mounted) setState(() => _working = false);
     }
