@@ -4,8 +4,9 @@ import 'package:provider/provider.dart';
 import '../../core/providers/app_provider.dart';
 import '../home/home_screen.dart';
 import '../explore/explore_screen.dart';
+import '../food/food_screen.dart';
 
-/// Only the two implemented feature pages appear in the navigation.
+/// Three working discovery tabs: Home, Explore and Food & Culture.
 class MainShell extends StatefulWidget {
   const MainShell({super.key});
 
@@ -33,6 +34,7 @@ class _MainShellState extends State<MainShell> {
         children: [
           HomeScreen(onSelectTab: (tab) => setState(() => _index = tab)),
           const ExploreScreen(),
+          const FoodScreen(),
         ],
       ),
       bottomNavigationBar: BottomNavigationBar(
@@ -49,6 +51,11 @@ class _MainShellState extends State<MainShell> {
             icon: const Icon(Icons.explore_outlined),
             activeIcon: const Icon(Icons.explore_rounded),
             label: arabic ? 'استكشف' : 'Explore',
+          ),
+          BottomNavigationBarItem(
+            icon: const Icon(Icons.restaurant_menu_outlined),
+            activeIcon: const Icon(Icons.restaurant_menu_rounded),
+            label: arabic ? 'الطعام' : 'Food',
           ),
         ],
       ),
