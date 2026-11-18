@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../core/providers/app_provider.dart';
-import '../home/home_screen.dart';
 import '../explore/explore_screen.dart';
+import '../food/food_screen.dart';
+import '../home/home_screen.dart';
 import '../rewards/adventure_rewards_screen.dart';
 
 /// Primary app sections use the persistent bottom navigation.
@@ -34,6 +35,7 @@ class _MainShellState extends State<MainShell> {
         children: [
           HomeScreen(onSelectTab: (tab) => setState(() => _index = tab)),
           const ExploreScreen(),
+          const FoodScreen(),
           const AdventureRewardsScreen(),
         ],
       ),
@@ -51,6 +53,11 @@ class _MainShellState extends State<MainShell> {
             icon: const Icon(Icons.explore_outlined),
             activeIcon: const Icon(Icons.explore_rounded),
             label: arabic ? 'استكشف' : 'Explore',
+          ),
+          BottomNavigationBarItem(
+            icon: const Icon(Icons.restaurant_menu_outlined),
+            activeIcon: const Icon(Icons.restaurant_menu_rounded),
+            label: arabic ? 'الطعام' : 'Food',
           ),
           BottomNavigationBarItem(
             icon: const Icon(Icons.stars_outlined),

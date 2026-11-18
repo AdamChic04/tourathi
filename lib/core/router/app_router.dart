@@ -12,6 +12,7 @@ import '../../features/shell/main_shell.dart';
 import '../../features/place_details/place_details_screen.dart';
 import '../../features/coming_soon/coming_soon_screen.dart';
 import '../../features/ai_planner/ai_planner_screen.dart';
+import '../../features/food/food_screen.dart';
 import '../../features/ai_planner/my_plans_screen.dart';
 import '../../features/ai_planner/saved_plans_store.dart';
 import '../../features/rewards/adventure_rewards_screen.dart';
@@ -89,6 +90,10 @@ class AppRouter {
         builder: (context, state) => PlaceDetailsScreen(
           placeId: state.pathParameters['id']!,
         ),
+      ),
+      GoRoute(
+        path: '/food',
+        builder: (context, state) => const FoodScreen(),
       ),
       GoRoute(
         path: '/ai-planner',
