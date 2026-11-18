@@ -1,0 +1,12 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "version": 2,
+  "framework": null,
+  "buildCommand": "bash scripts/vercel-build.sh",
+  "installCommand": "echo 'Flutter dependencies are installed by the Flutter build script'",
+  "outputDirectory": "build/web",
+  "routes": [
+    { "handle": "filesystem" },
+    { "src": "/.*", "dest": "/index.html" }
+  ]
+}
