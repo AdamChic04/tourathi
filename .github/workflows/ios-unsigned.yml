@@ -1,0 +1,66 @@
+name: TouRathi iPhone - Unsigned IPA
+
+# The compiled iOS app is packaged but NEVER signed or distributed.
+# Install on your own iPhone from Windows with Sideloadly and your Apple ID.
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - "lib/**"
+      - "ios/**"
+      - "assets/**"
+      - "pubspec.yaml"
+      - "pubspec.lock"
+      - ".github/workflows/ios-unsigned.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  unsigned-iphone-ipa:
+    name: Build unsigned iPhone IPA
+    runs-on: macos-15
+    timeout-minutes: 50
+    steps:
+      - name: Check out complete TouRathi project
+        uses: actions/checkout@v4
+
+      - name: Install Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: Show Xcode and CocoaPods versions
+        run: |
+          xcodebuild -version
+          pod --version
+
+      - name: Download Flutter packages
+        run: flutter pub get
+
+      - name: Compile native iOS app (no signing)
+        run: flutter build ios --release --no-codesign
+
+      - name: Package unsigned IPA
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -d build/ios/iphoneos/Runner.app
+          mkdir -p "$RUNNER_TEMP/tourathi-ipa/Payload"
+          /usr/bin/ditto build/ios/iphoneos/Runner.app "$RUNNER_TEMP/tourathi-ipa/Payload/Runner.app"
+          (
+            cd "$RUNNER_TEMP/tourathi-ipa"
+            /usr/bin/zip -qry "$GITHUB_WORKSPACE/TouRathi-iPhone-unsigned.ipa" Payload
+          )
+          /usr/bin/unzip -t TouRathi-iPhone-unsigned.ipa >/dev/null
+          echo "Unsigned IPA created. It must be signed by Sideloadly before installing on an iPhone."
+
+      - name: Make IPA available to download
+        uses: actions/upload-artifact@v4
+        with:
+          name: TouRathi-iPhone-unsigned
+          path: TouRathi-iPhone-unsigned.ipa
+          if-no-files-found: error
+          retention-days: 7
