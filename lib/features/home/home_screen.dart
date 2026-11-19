@@ -18,10 +18,11 @@ const Map<String, String> _photos = {
 };
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key, this.onSelectTab});
+  const HomeScreen({super.key, this.onSelectTab, this.onExploreCategory});
 
   /// MainShell owns the tab navigation. Home never pushes a nonexistent route.
   final ValueChanged<int>? onSelectTab;
+  final ValueChanged<String>? onExploreCategory;
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -45,7 +46,9 @@ class _HomeScreenState extends State<HomeScreen> {
     super.initState();
     _carouselController = PageController();
     _slideTimer = Timer.periodic(const Duration(seconds: 5), (_) {
-      if (!mounted || !_carouselController.hasClients || _featuredPlaces.isEmpty) {
+      if (!mounted ||
+          !_carouselController.hasClients ||
+          _featuredPlaces.isEmpty) {
         return;
       }
       final next = (_slide + 1) % _featuredPlaces.length;
@@ -67,9 +70,6 @@ class _HomeScreenState extends State<HomeScreen> {
   void _explore() => widget.onSelectTab?.call(1);
 
   void _viewPlace(Place place) => context.push('/place/${place.id}');
-
-  void _toggleFavorite(String id) =>
-      context.read<AppProvider>().toggleFavorite(id);
 
   @override
   Widget build(BuildContext context) {
@@ -99,7 +99,11 @@ class _HomeScreenState extends State<HomeScreen> {
                       color: palette.accent.withValues(alpha: .12),
                       borderRadius: BorderRadius.circular(13),
                     ),
-                    child: Icon(Icons.explore_rounded, color: palette.accent, size: 25),
+                    child: Icon(
+                      Icons.explore_rounded,
+                      color: palette.accent,
+                      size: 25,
+                    ),
                   ),
                   const SizedBox(width: 10),
                   Expanded(
@@ -122,21 +126,25 @@ class _HomeScreenState extends State<HomeScreen> {
                       onTap: () => context.push('/profile'),
                       child: Padding(
                         padding: const EdgeInsets.all(12),
-                        child: Icon(Icons.person_outline_rounded, color: palette.ink, size: 20),
+                        child: Icon(
+                          Icons.person_outline_rounded,
+                          color: palette.ink,
+                          size: 20,
+                        ),
                       ),
                     ),
                   ),
                 ],
               ),
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: 30),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 22),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    isArabic ? 'اكتشف جمال الأردن' : 'DISCOVER JORDAN',
+                    isArabic ? 'أهلاً بك في الأردن' : 'WELCOME TO JORDAN',
                     style: TextStyle(
                       color: palette.accent,
                       fontSize: 11,
@@ -155,7 +163,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       fontWeight: FontWeight.w800,
                     ),
                   ),
-                  const SizedBox(height: 17),
+                  const SizedBox(height: 18),
                   Material(
                     color: palette.card,
                     borderRadius: BorderRadius.circular(15),
@@ -172,15 +180,28 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                         child: Row(
                           children: [
-                            Icon(Icons.search_rounded, color: palette.muted, size: 23),
+                            Icon(
+                              Icons.search_rounded,
+                              color: palette.muted,
+                              size: 23,
+                            ),
                             const SizedBox(width: 12),
                             Expanded(
                               child: Text(
-                                isArabic ? 'ابحث عن وجهة...' : 'Search for a destination...',
-                                style: TextStyle(color: palette.muted, fontSize: 14),
+                                isArabic
+                                    ? 'ابحث عن وجهة...'
+                                    : 'Search for a destination...',
+                                style: TextStyle(
+                                  color: palette.muted,
+                                  fontSize: 14,
+                                ),
                               ),
                             ),
-                            Icon(Icons.arrow_forward_ios_rounded, color: palette.muted, size: 13),
+                            Icon(
+                              Icons.arrow_forward_ios_rounded,
+                              color: palette.muted,
+                              size: 13,
+                            ),
                           ],
                         ),
                       ),
@@ -189,7 +210,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 ],
               ),
             ),
-            const SizedBox(height: 25),
+            const SizedBox(height: 32),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 22),
               child: Row(
@@ -197,7 +218,11 @@ class _HomeScreenState extends State<HomeScreen> {
                   Expanded(
                     child: Text(
                       isArabic ? 'وجهات تستحق الزيارة' : 'Featured places',
-                      style: TextStyle(color: palette.ink, fontSize: 19, fontWeight: FontWeight.w800),
+                      style: TextStyle(
+                        color: palette.ink,
+                        fontSize: 19,
+                        fontWeight: FontWeight.w800,
+                      ),
                     ),
                   ),
                   Text(
@@ -236,24 +261,28 @@ class _HomeScreenState extends State<HomeScreen> {
                 final active = _slide == index;
                 return GestureDetector(
                   key: Key('home_dot_$index'),
-                  onTap: () => _carouselController.animateToPage(
-                    index,
-                    duration: const Duration(milliseconds: 350),
-                    curve: Curves.easeOutCubic,
-                  ),
+                  onTap:
+                      () => _carouselController.animateToPage(
+                        index,
+                        duration: const Duration(milliseconds: 350),
+                        curve: Curves.easeOutCubic,
+                      ),
                   child: Container(
                     width: active ? 23 : 6,
                     height: 6,
                     margin: const EdgeInsets.symmetric(horizontal: 3),
                     decoration: BoxDecoration(
-                      color: active ? palette.accent : palette.muted.withValues(alpha: .27),
+                      color:
+                          active
+                              ? palette.accent
+                              : palette.muted.withValues(alpha: .27),
                       borderRadius: BorderRadius.circular(10),
                     ),
                   ),
                 );
               }),
             ),
-            const SizedBox(height: 30),
+            const SizedBox(height: 38),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 22),
               child: Material(
@@ -278,7 +307,11 @@ class _HomeScreenState extends State<HomeScreen> {
                             color: palette.accent.withValues(alpha: .12),
                             borderRadius: BorderRadius.circular(15),
                           ),
-                          child: Icon(Icons.auto_awesome_rounded, color: palette.accent, size: 25),
+                          child: Icon(
+                            Icons.auto_awesome_rounded,
+                            color: palette.accent,
+                            size: 25,
+                          ),
                         ),
                         const SizedBox(width: 14),
                         Expanded(
@@ -286,149 +319,234 @@ class _HomeScreenState extends State<HomeScreen> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                isArabic ? 'خطط رحلتك بالذكاء الاصطناعي' : 'Plan your perfect trip',
-                                style: TextStyle(color: palette.ink, fontWeight: FontWeight.w800, fontSize: 15),
+                                isArabic
+                                    ? 'خطط رحلتك بالذكاء الاصطناعي'
+                                    : 'Plan your perfect trip',
+                                style: TextStyle(
+                                  color: palette.ink,
+                                  fontWeight: FontWeight.w800,
+                                  fontSize: 15,
+                                ),
                               ),
                               const SizedBox(height: 4),
                               Text(
-                                isArabic ? 'دع الذكاء الاصطناعي يقترح رحلتك' : 'A personal itinerary, made for you',
-                                style: TextStyle(color: palette.muted, fontSize: 12),
+                                isArabic
+                                    ? 'دع الذكاء الاصطناعي يقترح رحلتك'
+                                    : 'A personal itinerary, made for you',
+                                style: TextStyle(
+                                  color: palette.muted,
+                                  fontSize: 12,
+                                ),
                               ),
                             ],
                           ),
                         ),
-                        Icon(Icons.arrow_forward_rounded, color: palette.accent),
+                        Icon(
+                          Icons.arrow_forward_rounded,
+                          color: palette.accent,
+                        ),
                       ],
                     ),
                   ),
                 ),
               ),
             ),
-            const SizedBox(height: 15),
+            const SizedBox(height: 35),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 22),
               child: Material(
-                color: palette.card,
-                borderRadius: BorderRadius.circular(19),
+                color: const Color(0xFF3A3028),
+                borderRadius: BorderRadius.circular(20),
                 child: InkWell(
-                  key: const Key('home_food_button'),
-                  borderRadius: BorderRadius.circular(19),
-                  onTap: () => widget.onSelectTab?.call(2),
+                  key: const Key('home_journal_button'),
+                  borderRadius: BorderRadius.circular(20),
+                  onTap: () => context.push('/social-journal'),
                   child: Container(
-                    padding: const EdgeInsets.all(18),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 18,
+                      vertical: 16,
+                    ),
                     decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(19),
-                      border: Border.all(color: palette.border),
+                      borderRadius: BorderRadius.circular(20),
+                      gradient: const LinearGradient(
+                        colors: [Color(0xFF594332), Color(0xFF342C25)],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
                     ),
                     child: Row(
                       children: [
                         Container(
-                          width: 51,
-                          height: 51,
+                          width: 48,
+                          height: 48,
                           decoration: BoxDecoration(
-                            color: palette.accent.withValues(alpha: .12),
+                            color: Colors.white.withValues(alpha: .12),
                             borderRadius: BorderRadius.circular(15),
                           ),
-                          child: Icon(Icons.restaurant_menu_rounded,
-                              color: palette.accent, size: 25),
+                          child: const Icon(
+                            Icons.auto_stories_rounded,
+                            color: Color(0xFFF2D8B8),
+                            size: 24,
+                          ),
                         ),
-                        const SizedBox(width: 14),
+                        const SizedBox(width: 13),
                         Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                isArabic ? 'تذوّق الأردن' : 'Taste of Jordan',
-                                style: TextStyle(color: palette.ink,
-                                    fontWeight: FontWeight.w800, fontSize: 15),
+                                isArabic
+                                    ? 'مذكرات تراثي'
+                                    : 'Your travel journal',
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.w800,
+                                  fontSize: 15,
+                                ),
                               ),
                               const SizedBox(height: 4),
                               Text(
-                                isArabic ? 'أطباق وأسواق وتجارب محلية' :
-                                    'Discover dishes, markets and local culture',
-                                style: TextStyle(color: palette.muted,
-                                    fontSize: 12),
+                                isArabic
+                                    ? 'احفظ ذكرياتك وشارك قصتك'
+                                    : 'Keep your memories, share your story',
+                                style: const TextStyle(
+                                  color: Color(0xFFD5C8B9),
+                                  fontSize: 12,
+                                ),
                               ),
                             ],
                           ),
                         ),
-                        Icon(Icons.arrow_forward_rounded, color: palette.accent),
+                        const Icon(
+                          Icons.arrow_forward_rounded,
+                          color: Color(0xFFF2D8B8),
+                        ),
                       ],
                     ),
                   ),
                 ),
               ),
             ),
+            const SizedBox(height: 36),
             const SizedBox(height: 29),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 22),
               child: Row(
+                crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
                   Expanded(
-                    child: Text(
-                      isArabic ? 'جميع وجهات الأردن' : 'All Jordan destinations',
-                      style: TextStyle(color: palette.ink, fontWeight: FontWeight.w800, fontSize: 19),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          isArabic
+                              ? 'استكشف حسب اهتمامك'
+                              : 'Explore by interest',
+                          style: TextStyle(
+                            color: palette.ink,
+                            fontWeight: FontWeight.w800,
+                            fontSize: 19,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          isArabic
+                              ? 'اختر نوع التجربة التي تناسبك'
+                              : 'Choose the kind of day you want',
+                          style: TextStyle(color: palette.muted, fontSize: 12),
+                        ),
+                      ],
                     ),
                   ),
-                  TextButton(
+                  TextButton.icon(
                     key: const Key('home_see_all_button'),
                     onPressed: _explore,
-                    child: Text(
-                      isArabic ? 'عرض ${places.length} مكانًا' : 'See all ${places.length}',
-                      style: TextStyle(color: palette.accent, fontWeight: FontWeight.w700, fontSize: 13),
+                    icon: const Icon(Icons.arrow_forward_rounded, size: 16),
+                    label: Text(
+                      isArabic ? 'كل الوجهات' : 'All places',
+                      style: TextStyle(
+                        color: palette.accent,
+                        fontWeight: FontWeight.w700,
+                        fontSize: 13,
+                      ),
                     ),
                   ),
                 ],
               ),
             ),
-            const SizedBox(height: 8),
-            SizedBox(
-              height: 210,
-              child: ListView.separated(
-                padding: const EdgeInsets.symmetric(horizontal: 22),
-                scrollDirection: Axis.horizontal,
-                itemCount: places.length,
-                separatorBuilder: (_, __) => const SizedBox(width: 12),
-                itemBuilder: (context, index) {
-                  final place = places[index];
-                  return _DestinationCard(
-                    key: Key('home_place_${place.id}'),
-                    place: place,
-                    photo: place.imageUrl,
-                    isArabic: isArabic,
-                    palette: palette,
-                    saved: context.watch<AppProvider>().isFavorite(place.id),
-                    onTap: () => _viewPlace(place),
-                    onFavorite: () => _toggleFavorite(place.id),
+            const SizedBox(height: 14),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 22),
+              child: LayoutBuilder(
+                builder: (context, constraints) {
+                  final columns = constraints.maxWidth >= 680 ? 4 : 2;
+                  const categories =
+                      <({String id, String en, String ar, IconData icon})>[
+                        (
+                          id: 'heritage',
+                          en: 'Heritage',
+                          ar: 'التراث',
+                          icon: Icons.account_balance_rounded,
+                        ),
+                        (
+                          id: 'hiking',
+                          en: 'Nature',
+                          ar: 'الطبيعة',
+                          icon: Icons.park_rounded,
+                        ),
+                        (
+                          id: 'adventure',
+                          en: 'Adventure',
+                          ar: 'المغامرة',
+                          icon: Icons.landscape_rounded,
+                        ),
+                        (
+                          id: 'food',
+                          en: 'Food & crafts',
+                          ar: 'الطعام والحرف',
+                          icon: Icons.restaurant_rounded,
+                        ),
+                      ];
+                  return GridView.builder(
+                    key: const Key('home_interest_grid'),
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemCount: categories.length,
+                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: columns,
+                      crossAxisSpacing: 11,
+                      mainAxisSpacing: 11,
+                      childAspectRatio: columns == 4 ? 1.35 : 1.48,
+                    ),
+                    itemBuilder: (context, index) {
+                      final category = categories[index];
+                      final matching = places.where(
+                        (p) => p.category == category.id,
+                      );
+                      if (matching.isEmpty) return const SizedBox.shrink();
+                      final place = matching.first;
+                      final count = matching.length;
+                      return _InterestCard(
+                        key: Key('home_interest_${category.id}'),
+                        title: isArabic ? category.ar : category.en,
+                        subtitle: isArabic ? '$count أماكن' : '$count places',
+                        photo: place.imageUrl,
+                        icon: category.icon,
+                        onTap: () {
+                          final selectCategory = widget.onExploreCategory;
+                          if (selectCategory == null) {
+                            _explore();
+                          } else {
+                            selectCategory(category.id);
+                          }
+                        },
+                      );
+                    },
                   );
                 },
               ),
             ),
             const SizedBox(height: 28),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 22),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: _SmallShortcut(
-                      label: isArabic ? 'استكشف بالواقع المعزز' : 'Explore in AR',
-                      icon: Icons.view_in_ar_rounded,
-                      palette: palette,
-                      onTap: () => context.push('/ar-hub'),
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: _SmallShortcut(
-                      label: isArabic ? 'مذكرات السفر' : 'Travel journal',
-                      icon: Icons.auto_stories_outlined,
-                      palette: palette,
-                      onTap: () => context.push('/social-journal'),
-                    ),
-                  ),
-                ],
-              ),
-            ),
           ],
         ),
       ),
@@ -438,12 +556,12 @@ class _HomeScreenState extends State<HomeScreen> {
 
 class _HomePalette {
   _HomePalette(bool dark)
-      : background = dark ? const Color(0xFF181714) : const Color(0xFFF8F7F4),
-        card = dark ? const Color(0xFF292721) : Colors.white,
-        ink = dark ? const Color(0xFFF8F2E9) : const Color(0xFF22221F),
-        muted = dark ? const Color(0xFFAEA89F) : const Color(0xFF89867F),
-        border = dark ? const Color(0xFF403D35) : const Color(0xFFEBE9E2),
-        accent = dark ? const Color(0xFFD9A67D) : const Color(0xFF9B6548);
+    : background = dark ? const Color(0xFF181714) : const Color(0xFFF8F7F4),
+      card = dark ? const Color(0xFF292721) : Colors.white,
+      ink = dark ? const Color(0xFFF8F2E9) : const Color(0xFF22221F),
+      muted = dark ? const Color(0xFFAEA89F) : const Color(0xFF89867F),
+      border = dark ? const Color(0xFF403D35) : const Color(0xFFEBE9E2),
+      accent = dark ? const Color(0xFFD9A67D) : const Color(0xFF9B6548);
 
   final Color background;
   final Color card;
@@ -451,6 +569,99 @@ class _HomePalette {
   final Color muted;
   final Color border;
   final Color accent;
+}
+
+class _InterestCard extends StatelessWidget {
+  const _InterestCard({
+    super.key,
+    required this.title,
+    required this.subtitle,
+    required this.photo,
+    required this.icon,
+    required this.onTap,
+  });
+
+  final String title;
+  final String subtitle;
+  final String photo;
+  final IconData icon;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) => ClipRRect(
+    borderRadius: BorderRadius.circular(18),
+    child: Material(
+      color: const Color(0xFF514335),
+      child: InkWell(
+        onTap: onTap,
+        child: Stack(
+          fit: StackFit.expand,
+          children: [
+            Image.asset(
+              photo,
+              fit: BoxFit.cover,
+              errorBuilder:
+                  (_, __, ___) => const ColoredBox(
+                    color: Color(0xFF514335),
+                    child: Icon(
+                      Icons.landscape_rounded,
+                      color: Colors.white54,
+                      size: 34,
+                    ),
+                  ),
+            ),
+            const DecoratedBox(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [Color(0x18000000), Color(0xD9000000)],
+                ),
+              ),
+            ),
+            Positioned(
+              top: 11,
+              right: 11,
+              child: Container(
+                width: 32,
+                height: 32,
+                decoration: BoxDecoration(
+                  color: Colors.white.withValues(alpha: .18),
+                  borderRadius: BorderRadius.circular(11),
+                ),
+                child: Icon(icon, size: 18, color: Colors.white),
+              ),
+            ),
+            Positioned(
+              left: 13,
+              right: 13,
+              bottom: 12,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 15,
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                  const SizedBox(height: 3),
+                  Text(
+                    subtitle,
+                    style: const TextStyle(color: Colors.white70, fontSize: 11),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    ),
+  );
 }
 
 class _HeroSlide extends StatelessWidget {
@@ -477,20 +688,32 @@ class _HeroSlide extends StatelessWidget {
           child: Stack(
             fit: StackFit.expand,
             children: [
-              Image.asset(photo,
-                 fit: BoxFit.cover,
-                 errorBuilder: (_, __, ___) => const ColoredBox(
-                   color: Color(0xFF79543C),
-                   child: Center(child: Icon(Icons.landscape_outlined,
-                     color: Colors.white70, size: 38)),
-                 )),
+              Image.asset(
+                photo,
+                fit: BoxFit.cover,
+                errorBuilder:
+                    (_, __, ___) => const ColoredBox(
+                      color: Color(0xFF79543C),
+                      child: Center(
+                        child: Icon(
+                          Icons.landscape_outlined,
+                          color: Colors.white70,
+                          size: 38,
+                        ),
+                      ),
+                    ),
+              ),
               const DecoratedBox(
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
                     begin: Alignment.topCenter,
                     end: Alignment.bottomCenter,
                     stops: [0, .45, 1],
-                    colors: [Color(0x30000000), Color(0x08000000), Color(0xE9000000)],
+                    colors: [
+                      Color(0x30000000),
+                      Color(0x08000000),
+                      Color(0xE9000000),
+                    ],
                   ),
                 ),
               ),
@@ -498,11 +721,16 @@ class _HeroSlide extends StatelessWidget {
                 top: 17,
                 left: 17,
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 7,
+                  ),
                   decoration: BoxDecoration(
                     color: Colors.black.withValues(alpha: .28),
                     borderRadius: BorderRadius.circular(30),
-                    border: Border.all(color: Colors.white.withValues(alpha: .24)),
+                    border: Border.all(
+                      color: Colors.white.withValues(alpha: .24),
+                    ),
                   ),
                   child: Text(
                     isArabic ? 'اكتشف الأردن' : 'JORDAN HIGHLIGHTS',
@@ -524,11 +752,18 @@ class _HeroSlide extends StatelessWidget {
                   children: [
                     Row(
                       children: [
-                        const Icon(Icons.place_outlined, color: Colors.white70, size: 14),
+                        const Icon(
+                          Icons.place_outlined,
+                          color: Colors.white70,
+                          size: 14,
+                        ),
                         const SizedBox(width: 5),
                         Text(
                           isArabic ? place.locationAr : place.location,
-                          style: const TextStyle(color: Colors.white70, fontSize: 12),
+                          style: const TextStyle(
+                            color: Colors.white70,
+                            fontSize: 12,
+                          ),
                         ),
                       ],
                     ),
@@ -548,7 +783,10 @@ class _HeroSlide extends StatelessWidget {
                         Expanded(
                           child: Text(
                             isArabic ? 'ابدأ المغامرة' : 'Discover the story',
-                            style: const TextStyle(color: Colors.white70, fontSize: 12.5),
+                            style: const TextStyle(
+                              color: Colors.white70,
+                              fontSize: 12.5,
+                            ),
                           ),
                         ),
                         Container(
@@ -558,174 +796,15 @@ class _HeroSlide extends StatelessWidget {
                             color: Colors.white,
                             shape: BoxShape.circle,
                           ),
-                          child: const Icon(Icons.arrow_outward_rounded, color: Color(0xFF2D2925)),
+                          child: const Icon(
+                            Icons.arrow_outward_rounded,
+                            color: Color(0xFF2D2925),
+                          ),
                         ),
                       ],
                     ),
                   ],
                 ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _DestinationCard extends StatelessWidget {
-  const _DestinationCard({
-    super.key,
-    required this.place,
-    required this.photo,
-    required this.isArabic,
-    required this.palette,
-    required this.saved,
-    required this.onTap,
-    required this.onFavorite,
-  });
-
-  final Place place;
-  final String photo;
-  final bool isArabic;
-  final _HomePalette palette;
-  final bool saved;
-  final VoidCallback onTap;
-  final VoidCallback onFavorite;
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      width: 200,
-      child: Material(
-        color: palette.card,
-        borderRadius: BorderRadius.circular(17),
-        child: InkWell(
-          borderRadius: BorderRadius.circular(17),
-          onTap: onTap,
-          child: Container(
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(17),
-              border: Border.all(color: palette.border),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Expanded(
-                  child: ClipRRect(
-                    borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
-                    child: Stack(
-                      fit: StackFit.expand,
-                      children: [
-                        Image.asset(photo,
-                           fit: BoxFit.cover,
-                           errorBuilder: (_, __, ___) => const ColoredBox(
-                             color: Color(0xFF79543C),
-                             child: Center(child: Icon(Icons.landscape_outlined,
-                                 color: Colors.white70, size: 32)),
-                           )),
-                        Positioned(
-                          right: 10,
-                          top: 10,
-                          child: Material(
-                            color: Colors.white.withValues(alpha: .94),
-                            shape: const CircleBorder(),
-                            child: InkWell(
-                              key: Key('home_favorite_${place.id}'),
-                              customBorder: const CircleBorder(),
-                              onTap: onFavorite,
-                              child: Padding(
-                                padding: const EdgeInsets.all(8),
-                                child: Icon(
-                                  saved ? Icons.favorite_rounded : Icons.favorite_border_rounded,
-                                  color: saved ? const Color(0xFFD46161) : const Color(0xFF453B35),
-                                  size: 17,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(12, 10, 12, 12),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        isArabic ? place.nameAr : place.name,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: TextStyle(color: palette.ink, fontWeight: FontWeight.w800, fontSize: 14),
-                      ),
-                      const SizedBox(height: 4),
-                      Row(
-                        children: [
-                          Icon(Icons.place_outlined, size: 12, color: palette.muted),
-                          const SizedBox(width: 3),
-                          Expanded(
-                            child: Text(
-                              isArabic ? place.locationAr : place.location,
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: TextStyle(color: palette.muted, fontSize: 11),
-                            ),
-                          ),
-                          // No public visitor ratings have been imported yet.
-                          // Avoid showing a misleading "0.0 stars" score.
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _SmallShortcut extends StatelessWidget {
-  const _SmallShortcut({
-    required this.label,
-    required this.icon,
-    required this.palette,
-    required this.onTap,
-  });
-
-  final String label;
-  final IconData icon;
-  final _HomePalette palette;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return Material(
-      color: palette.card,
-      borderRadius: BorderRadius.circular(16),
-      child: InkWell(
-        borderRadius: BorderRadius.circular(16),
-        onTap: onTap,
-        child: Container(
-          padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 14),
-          decoration: BoxDecoration(
-            border: Border.all(color: palette.border),
-            borderRadius: BorderRadius.circular(16),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Icon(icon, color: palette.accent, size: 23),
-              const SizedBox(height: 11),
-              Text(
-                label,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(color: palette.ink, fontWeight: FontWeight.w700, fontSize: 12),
               ),
             ],
           ),

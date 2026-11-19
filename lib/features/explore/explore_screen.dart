@@ -20,7 +20,9 @@ enum _ExploreSort { featured, name }
 enum _ExploreView { grid, overview }
 
 class ExploreScreen extends StatefulWidget {
-  const ExploreScreen({super.key});
+  const ExploreScreen({super.key, this.initialCategory = 'all'});
+
+  final String initialCategory;
 
   @override
   State<ExploreScreen> createState() => _ExploreScreenState();
@@ -28,10 +30,16 @@ class ExploreScreen extends StatefulWidget {
 
 class _ExploreScreenState extends State<ExploreScreen> {
   final TextEditingController _searchController = TextEditingController();
-  String _category = 'all';
+  late String _category;
   bool _savedOnly = false;
   _ExploreSort _sort = _ExploreSort.featured;
   _ExploreView _view = _ExploreView.grid;
+
+  @override
+  void initState() {
+    super.initState();
+    _category = widget.initialCategory;
+  }
 
   List<Place> get _places => JordanPlaceSeed.places;
 

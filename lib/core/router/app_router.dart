@@ -16,7 +16,7 @@ import '../../features/food/food_screen.dart';
 import '../../features/ai_planner/my_plans_screen.dart';
 import '../../features/ai_planner/saved_plans_store.dart';
 import '../../features/rewards/adventure_rewards_screen.dart';
-import '../../features/social_journal/travel_journal_screen.dart';
+import '../../features/journal/travel_journal_screen.dart';
 
 class AppRouter {
   AppRouter._();

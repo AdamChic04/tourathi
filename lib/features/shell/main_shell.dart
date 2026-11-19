@@ -3,11 +3,10 @@ import 'package:provider/provider.dart';
 
 import '../../core/providers/app_provider.dart';
 import '../explore/explore_screen.dart';
-import '../food/food_screen.dart';
 import '../home/home_screen.dart';
-import '../rewards/adventure_rewards_screen.dart';
+import 'more_screen.dart';
 
-/// Primary app sections use the persistent bottom navigation.
+/// A focused three-destination shell. Secondary tools stay accessible in More.
 class MainShell extends StatefulWidget {
   const MainShell({super.key});
 
@@ -17,12 +16,20 @@ class MainShell extends StatefulWidget {
 
 class _MainShellState extends State<MainShell> {
   int _index = 0;
+  String _exploreCategory = 'all';
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) context.read<AppProvider>().refreshPlaces();
+    });
+  }
+
+  void _selectTab(int tab) {
+    setState(() {
+      _index = tab;
+      if (tab == 1) _exploreCategory = 'all';
     });
   }
 
@@ -33,15 +40,23 @@ class _MainShellState extends State<MainShell> {
       body: IndexedStack(
         index: _index,
         children: [
-          HomeScreen(onSelectTab: (tab) => setState(() => _index = tab)),
-          const ExploreScreen(),
-          const FoodScreen(),
-          const AdventureRewardsScreen(),
+          HomeScreen(
+            onSelectTab: _selectTab,
+            onExploreCategory: (category) => setState(() {
+              _exploreCategory = category;
+              _index = 1;
+            }),
+          ),
+          ExploreScreen(
+            key: ValueKey(_exploreCategory),
+            initialCategory: _exploreCategory,
+          ),
+          const MoreScreen(),
         ],
       ),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _index,
-        onTap: (tab) => setState(() => _index = tab),
+        onTap: _selectTab,
         type: BottomNavigationBarType.fixed,
         items: [
           BottomNavigationBarItem(
@@ -55,14 +70,9 @@ class _MainShellState extends State<MainShell> {
             label: arabic ? 'استكشف' : 'Explore',
           ),
           BottomNavigationBarItem(
-            icon: const Icon(Icons.restaurant_menu_outlined),
-            activeIcon: const Icon(Icons.restaurant_menu_rounded),
-            label: arabic ? 'الطعام' : 'Food',
-          ),
-          BottomNavigationBarItem(
-            icon: const Icon(Icons.stars_outlined),
-            activeIcon: const Icon(Icons.stars_rounded),
-            label: arabic ? 'المكافآت' : 'Rewards',
+            icon: const Icon(Icons.grid_view_rounded),
+            activeIcon: const Icon(Icons.grid_view_rounded),
+            label: arabic ? 'المزيد' : 'More',
           ),
         ],
       ),
