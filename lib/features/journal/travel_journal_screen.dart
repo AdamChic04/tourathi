@@ -525,280 +525,288 @@ class _TravelJournalScreenState extends State<TravelJournalScreen>
         var saving = false;
         return StatefulBuilder(
           builder: (ctx, setSheet) {
-            return Container(
-              height: MediaQuery.sizeOf(ctx).height * .91,
-              padding: EdgeInsets.fromLTRB(
-                20,
-                16,
-                20,
-                MediaQuery.viewInsetsOf(ctx).bottom + 16,
+            return Material(
+              color: const Color(0xFFFAF9F6),
+              borderRadius: const BorderRadius.vertical(
+                top: Radius.circular(25),
               ),
-              decoration: const BoxDecoration(
-                color: Color(0xFFFAF9F6),
-                borderRadius: BorderRadius.vertical(top: Radius.circular(25)),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Center(
-                    child: Container(
-                      width: 38,
-                      height: 4,
-                      decoration: BoxDecoration(
-                        color: Colors.black26,
-                        borderRadius: BorderRadius.circular(4),
+              clipBehavior: Clip.antiAlias,
+              child: Container(
+                height: MediaQuery.sizeOf(ctx).height * .91,
+                padding: EdgeInsets.fromLTRB(
+                  20,
+                  16,
+                  20,
+                  MediaQuery.viewInsetsOf(ctx).bottom + 16,
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Center(
+                      child: Container(
+                        width: 38,
+                        height: 4,
+                        decoration: BoxDecoration(
+                          color: Colors.black26,
+                          borderRadius: BorderRadius.circular(4),
+                        ),
                       ),
                     ),
-                  ),
-                  const SizedBox(height: 18),
-                  Text(
-                    existing == null
-                        ? t('Write a memory', 'اكتب ذكرى')
-                        : t('Edit memory', 'تعديل الذكرى'),
-                    style: const TextStyle(
-                      fontSize: 22,
-                      fontWeight: FontWeight.w800,
+                    const SizedBox(height: 18),
+                    Text(
+                      existing == null
+                          ? t('Write a memory', 'اكتب ذكرى')
+                          : t('Edit memory', 'تعديل الذكرى'),
+                      style: const TextStyle(
+                        fontSize: 22,
+                        fontWeight: FontWeight.w800,
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 14),
-                  Expanded(
-                    child: ListView(
-                      children: [
-                        TextField(
-                          controller: title,
-                          maxLength: 80,
-                          decoration: InputDecoration(
-                            labelText: t('Title *', 'العنوان *'),
-                            border: const OutlineInputBorder(),
-                          ),
-                        ),
-                        const SizedBox(height: 12),
-                        TextField(
-                          controller: body,
-                          minLines: 4,
-                          maxLines: 7,
-                          maxLength: 1000,
-                          decoration: InputDecoration(
-                            labelText: t('Tell your story', 'اكتب قصتك'),
-                            alignLabelWithHint: true,
-                            border: const OutlineInputBorder(),
-                          ),
-                        ),
-                        const SizedBox(height: 12),
-                        DropdownButtonFormField<String>(
-                          value: placeId,
-                          isExpanded: true,
-                          decoration: InputDecoration(
-                            labelText: t(
-                              'Link a Jordan place',
-                              'اربط بمكان أردني',
+                    const SizedBox(height: 14),
+                    Expanded(
+                      child: ListView(
+                        children: [
+                          TextField(
+                            controller: title,
+                            maxLength: 80,
+                            decoration: InputDecoration(
+                              labelText: t('Title *', 'العنوان *'),
+                              border: const OutlineInputBorder(),
                             ),
-                            border: const OutlineInputBorder(),
                           ),
-                          items: [
-                            DropdownMenuItem<String>(
-                              value: null,
-                              child: Text(t('No place', 'بدون مكان')),
+                          const SizedBox(height: 12),
+                          TextField(
+                            controller: body,
+                            minLines: 4,
+                            maxLines: 7,
+                            maxLength: 1000,
+                            decoration: InputDecoration(
+                              labelText: t('Tell your story', 'اكتب قصتك'),
+                              alignLabelWithHint: true,
+                              border: const OutlineInputBorder(),
                             ),
-                            ...places.map(
-                              (p) => DropdownMenuItem<String>(
-                                value: p.id,
-                                child: Text(_ar ? p.nameAr : p.name),
+                          ),
+                          const SizedBox(height: 12),
+                          DropdownButtonFormField<String>(
+                            value: placeId,
+                            isExpanded: true,
+                            decoration: InputDecoration(
+                              labelText: t(
+                                'Link a Jordan place',
+                                'اربط بمكان أردني',
+                              ),
+                              border: const OutlineInputBorder(),
+                            ),
+                            items: [
+                              DropdownMenuItem<String>(
+                                value: null,
+                                child: Text(t('No place', 'بدون مكان')),
+                              ),
+                              ...places.map(
+                                (p) => DropdownMenuItem<String>(
+                                  value: p.id,
+                                  child: Text(_ar ? p.nameAr : p.name),
+                                ),
+                              ),
+                            ],
+                            onChanged: (v) => setSheet(() => placeId = v),
+                          ),
+                          const SizedBox(height: 12),
+                          DropdownButtonFormField<String>(
+                            value: tripId,
+                            isExpanded: true,
+                            decoration: InputDecoration(
+                              labelText: t(
+                                'Link a saved trip',
+                                'اربط برحلة محفوظة',
+                              ),
+                              border: const OutlineInputBorder(),
+                            ),
+                            items: [
+                              DropdownMenuItem<String>(
+                                value: null,
+                                child: Text(t('No trip', 'بدون رحلة')),
+                              ),
+                              ...plans.map(
+                                (p) => DropdownMenuItem<String>(
+                                  value: p.id,
+                                  child: Text(p.destination),
+                                ),
+                              ),
+                            ],
+                            onChanged: (v) => setSheet(() => tripId = v),
+                          ),
+                          const SizedBox(height: 12),
+                          OutlinedButton.icon(
+                            onPressed: () async {
+                              final x = await ImagePicker().pickImage(
+                                source: ImageSource.gallery,
+                                imageQuality: 78,
+                                maxWidth: 1600,
+                              );
+                              if (x != null) {
+                                photo = await x.readAsBytes();
+                                photoPath = null;
+                                setSheet(() {});
+                              }
+                            },
+                            icon: const Icon(
+                              Icons.add_photo_alternate_outlined,
+                            ),
+                            label: Text(
+                              photo == null
+                                  ? t('Add a photo', 'إضافة صورة')
+                                  : t('Change photo', 'تغيير الصورة'),
+                            ),
+                          ),
+                          if (photo != null)
+                            Padding(
+                              padding: const EdgeInsets.only(top: 8),
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(12),
+                                child: Image.memory(
+                                  photo!,
+                                  height: 160,
+                                  width: double.infinity,
+                                  fit: BoxFit.cover,
+                                ),
                               ),
                             ),
-                          ],
-                          onChanged: (v) => setSheet(() => placeId = v),
-                        ),
-                        const SizedBox(height: 12),
-                        DropdownButtonFormField<String>(
-                          value: tripId,
-                          isExpanded: true,
-                          decoration: InputDecoration(
-                            labelText: t(
-                              'Link a saved trip',
-                              'اربط برحلة محفوظة',
-                            ),
-                            border: const OutlineInputBorder(),
+                          const SizedBox(height: 16),
+                          Text(
+                            t('Who can see this?', 'من يمكنه رؤية ذلك؟'),
+                            style: const TextStyle(fontWeight: FontWeight.w700),
                           ),
-                          items: [
-                            DropdownMenuItem<String>(
-                              value: null,
-                              child: Text(t('No trip', 'بدون رحلة')),
+                          RadioListTile<String>(
+                            contentPadding: EdgeInsets.zero,
+                            value: 'private',
+                            groupValue: visibility,
+                            title: Text(t('Only me', 'أنا فقط')),
+                            subtitle: Text(
+                              t('Private by default', 'خاصة افتراضياً'),
                             ),
-                            ...plans.map(
-                              (p) => DropdownMenuItem<String>(
-                                value: p.id,
-                                child: Text(p.destination),
-                              ),
-                            ),
-                          ],
-                          onChanged: (v) => setSheet(() => tripId = v),
-                        ),
-                        const SizedBox(height: 12),
-                        OutlinedButton.icon(
-                          onPressed: () async {
-                            final x = await ImagePicker().pickImage(
-                              source: ImageSource.gallery,
-                              imageQuality: 78,
-                              maxWidth: 1600,
-                            );
-                            if (x != null) {
-                              photo = await x.readAsBytes();
-                              photoPath = null;
-                              setSheet(() {});
-                            }
-                          },
-                          icon: const Icon(Icons.add_photo_alternate_outlined),
-                          label: Text(
-                            photo == null
-                                ? t('Add a photo', 'إضافة صورة')
-                                : t('Change photo', 'تغيير الصورة'),
+                            onChanged: (v) => setSheet(() => visibility = v!),
                           ),
-                        ),
-                        if (photo != null)
-                          Padding(
-                            padding: const EdgeInsets.only(top: 8),
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.circular(12),
-                              child: Image.memory(
-                                photo!,
-                                height: 160,
-                                width: double.infinity,
-                                fit: BoxFit.cover,
-                              ),
-                            ),
+                          RadioListTile<String>(
+                            contentPadding: EdgeInsets.zero,
+                            value: 'shared',
+                            groupValue: visibility,
+                            title: Text(t('Community feed', 'مجتمع تراثي')),
+                            onChanged: (v) => setSheet(() => visibility = v!),
                           ),
-                        const SizedBox(height: 16),
-                        Text(
-                          t('Who can see this?', 'من يمكنه رؤية ذلك؟'),
-                          style: const TextStyle(fontWeight: FontWeight.w700),
-                        ),
-                        RadioListTile<String>(
-                          contentPadding: EdgeInsets.zero,
-                          value: 'private',
-                          groupValue: visibility,
-                          title: Text(t('Only me', 'أنا فقط')),
-                          subtitle: Text(
-                            t('Private by default', 'خاصة افتراضياً'),
-                          ),
-                          onChanged: (v) => setSheet(() => visibility = v!),
-                        ),
-                        RadioListTile<String>(
-                          contentPadding: EdgeInsets.zero,
-                          value: 'shared',
-                          groupValue: visibility,
-                          title: Text(t('Community feed', 'مجتمع تراثي')),
-                          onChanged: (v) => setSheet(() => visibility = v!),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
-                  ),
-                  SizedBox(
-                    width: double.infinity,
-                    child: FilledButton.icon(
-                      onPressed:
-                          saving
-                              ? null
-                              : () async {
-                                if (title.text.trim().isEmpty) {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(
-                                      content: Text(
-                                        t(
-                                          'Add a title first.',
-                                          'أضف عنواناً أولاً.',
+                    SizedBox(
+                      width: double.infinity,
+                      child: FilledButton.icon(
+                        onPressed:
+                            saving
+                                ? null
+                                : () async {
+                                  if (title.text.trim().isEmpty) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text(
+                                          t(
+                                            'Add a title first.',
+                                            'أضف عنواناً أولاً.',
+                                          ),
                                         ),
                                       ),
-                                    ),
-                                  );
-                                  return;
-                                }
-                                setSheet(() => saving = true);
-                                try {
-                                  final now = DateTime.now();
-                                  final id =
-                                      existing?.id ??
-                                      'j${now.microsecondsSinceEpoch}';
-                                  final matchingPlace = places.where(
-                                    (p) => p.id == placeId,
-                                  );
-                                  final matchingTrip = plans.where(
-                                    (p) => p.id == tripId,
-                                  );
-                                  final place =
-                                      matchingPlace.isEmpty
-                                          ? null
-                                          : matchingPlace.first;
-                                  final trip =
-                                      matchingTrip.isEmpty
-                                          ? null
-                                          : matchingTrip.first;
-                                  final user =
-                                      Supabase
+                                    );
+                                    return;
+                                  }
+                                  setSheet(() => saving = true);
+                                  try {
+                                    final now = DateTime.now();
+                                    final id =
+                                        existing?.id ??
+                                        'j${now.microsecondsSinceEpoch}';
+                                    final matchingPlace = places.where(
+                                      (p) => p.id == placeId,
+                                    );
+                                    final matchingTrip = plans.where(
+                                      (p) => p.id == tripId,
+                                    );
+                                    final place =
+                                        matchingPlace.isEmpty
+                                            ? null
+                                            : matchingPlace.first;
+                                    final trip =
+                                        matchingTrip.isEmpty
+                                            ? null
+                                            : matchingTrip.first;
+                                    final user =
+                                        Supabase
+                                            .instance
+                                            .client
+                                            .auth
+                                            .currentUser
+                                            ?.id ??
+                                        'demo:${DemoSession.role ?? 'tourist'}';
+                                    if (photo != null &&
+                                        Supabase
+                                                .instance
+                                                .client
+                                                .auth
+                                                .currentUser !=
+                                            null) {
+                                      photoPath = await JournalRepository
                                           .instance
-                                          .client
-                                          .auth
-                                          .currentUser
-                                          ?.id ??
-                                      'demo:${DemoSession.role ?? 'tourist'}';
-                                  if (photo != null &&
-                                      Supabase
-                                              .instance
-                                              .client
-                                              .auth
-                                              .currentUser !=
-                                          null) {
-                                    photoPath = await JournalRepository.instance
-                                        .uploadPhoto(id, photo!);
+                                          .uploadPhoto(id, photo!);
+                                    }
+                                    final entry = JournalEntry(
+                                      id: id,
+                                      userId: user,
+                                      title: title.text.trim(),
+                                      body: body.text.trim(),
+                                      visibility: visibility,
+                                      createdAt: existing?.createdAt ?? now,
+                                      updatedAt: now,
+                                      placeId: placeId,
+                                      placeName:
+                                          place == null
+                                              ? null
+                                              : (_ar
+                                                  ? place.nameAr
+                                                  : place.name),
+                                      tripId: tripId,
+                                      tripName: trip?.destination,
+                                      photoBase64:
+                                          photo == null
+                                              ? null
+                                              : base64Encode(photo!),
+                                      photoPath: photoPath,
+                                    );
+                                    final synced = await JournalRepository
+                                        .instance
+                                        .save(entry);
+                                    if (ctx.mounted) Navigator.pop(ctx, synced);
+                                  } catch (e) {
+                                    if (ctx.mounted) {
+                                      setSheet(() => saving = false);
+                                    }
+                                    _notice(
+                                      t('Save failed: $e', 'فشل الحفظ: $e'),
+                                    );
                                   }
-                                  final entry = JournalEntry(
-                                    id: id,
-                                    userId: user,
-                                    title: title.text.trim(),
-                                    body: body.text.trim(),
-                                    visibility: visibility,
-                                    createdAt: existing?.createdAt ?? now,
-                                    updatedAt: now,
-                                    placeId: placeId,
-                                    placeName:
-                                        place == null
-                                            ? null
-                                            : (_ar ? place.nameAr : place.name),
-                                    tripId: tripId,
-                                    tripName: trip?.destination,
-                                    photoBase64:
-                                        photo == null
-                                            ? null
-                                            : base64Encode(photo!),
-                                    photoPath: photoPath,
-                                  );
-                                  final synced = await JournalRepository
-                                      .instance
-                                      .save(entry);
-                                  if (ctx.mounted) Navigator.pop(ctx, synced);
-                                } catch (e) {
-                                  if (ctx.mounted) {
-                                    setSheet(() => saving = false);
-                                  }
-                                  _notice(
-                                    t('Save failed: $e', 'فشل الحفظ: $e'),
-                                  );
-                                }
-                              },
-                      icon:
-                          saving
-                              ? const SizedBox(
-                                width: 16,
-                                height: 16,
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2,
-                                ),
-                              )
-                              : const Icon(Icons.save_outlined),
-                      label: Text(t('Save entry', 'حفظ الذكرى')),
+                                },
+                        icon:
+                            saving
+                                ? const SizedBox(
+                                  width: 16,
+                                  height: 16,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                  ),
+                                )
+                                : const Icon(Icons.save_outlined),
+                        label: Text(t('Save entry', 'حفظ الذكرى')),
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             );
           },
