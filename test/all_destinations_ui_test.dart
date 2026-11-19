@@ -65,7 +65,7 @@ void main() {
         .queryParameters['query'], contains('Amman Citadel'));
   });
 
-  testWidgets('Home makes all 61 available, while the hero stays curated',
+  testWidgets('Home highlights interests and links to the full catalog',
       (tester) async {
     tester.view.physicalSize = const Size(800, 1200);
     tester.view.devicePixelRatio = 1;
@@ -77,8 +77,34 @@ void main() {
       child: const MaterialApp(home: HomeScreen()),
     ));
     await tester.pump();
-    expect(find.text('See all 61'), findsOneWidget);
+    expect(find.text('All places'), findsOneWidget);
     expect(find.byKey(const Key('home_featured_carousel')), findsOneWidget);
+    expect(find.byKey(const Key('home_interest_grid')), findsOneWidget);
+    expect(find.byKey(const Key('home_interest_heritage')), findsOneWidget);
+    expect(find.byKey(const Key('home_interest_hiking')), findsOneWidget);
+    expect(find.byKey(const Key('home_interest_adventure')), findsOneWidget);
+    expect(find.byKey(const Key('home_interest_food')), findsOneWidget);
+    await tester.pumpWidget(const SizedBox.shrink());
+  });
+
+  testWidgets('Explore accepts a category selected from the home screen',
+      (tester) async {
+    tester.view.physicalSize = const Size(800, 1200);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    final hikingCount = JordanPlaceSeed.places
+        .where((place) => place.category == 'hiking')
+        .length;
+
+    await tester.pumpWidget(ChangeNotifierProvider(
+      create: (_) => AppProvider(),
+      child: const MaterialApp(
+        home: ExploreScreen(initialCategory: 'hiking'),
+      ),
+    ));
+    await tester.pump();
+    expect(find.text('$hikingCount Jordan destinations'), findsOneWidget);
     await tester.pumpWidget(const SizedBox.shrink());
   });
 
