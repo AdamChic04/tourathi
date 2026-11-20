@@ -427,8 +427,71 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
             ),
-            const SizedBox(height: 36),
-            const SizedBox(height: 29),
+            const SizedBox(height: 26),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 22),
+              child: Material(
+                color: const Color(0xFF493E32),
+                borderRadius: BorderRadius.circular(20),
+                child: InkWell(
+                  key: const Key('home_travel_groups_button'),
+                  borderRadius: BorderRadius.circular(20),
+                  onTap: () => context.push('/travel-groups'),
+                  child: Padding(
+                    padding: const EdgeInsets.all(17),
+                    child: Row(
+                      children: [
+                        Container(
+                          width: 45,
+                          height: 45,
+                          decoration: BoxDecoration(
+                            color: Colors.white.withValues(alpha: .12),
+                            borderRadius: BorderRadius.circular(14),
+                          ),
+                          child: const Icon(
+                            Icons.groups_rounded,
+                            color: Color(0xFFE4C98E),
+                          ),
+                        ),
+                        const SizedBox(width: 13),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                isArabic
+                                    ? 'اكتشف الأردن مع مجموعة'
+                                    : 'Explore Jordan together',
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w800,
+                                ),
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                isArabic
+                                    ? 'انضم لمستكشفين يشاركونك الاهتمام'
+                                    : 'Meet travellers who share your interests',
+                                style: const TextStyle(
+                                  color: Colors.white70,
+                                  fontSize: 11.5,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const Icon(
+                          Icons.arrow_forward_rounded,
+                          color: Color(0xFFE4C98E),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(height: 31),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 22),
               child: Row(
