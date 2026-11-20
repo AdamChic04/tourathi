@@ -2,11 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../core/providers/app_provider.dart';
+import '../extra_features/feature_screens.dart';
 import '../explore/explore_screen.dart';
 import '../home/home_screen.dart';
 import 'more_screen.dart';
 
-/// A focused three-destination shell. Secondary tools stay accessible in More.
+/// A focused travel shell with discovery and activity tabs. Account stays in More.
 class MainShell extends StatefulWidget {
   const MainShell({super.key});
 
@@ -42,15 +43,18 @@ class _MainShellState extends State<MainShell> {
         children: [
           HomeScreen(
             onSelectTab: _selectTab,
-            onExploreCategory: (category) => setState(() {
-              _exploreCategory = category;
-              _index = 1;
-            }),
+            onExploreCategory:
+                (category) => setState(() {
+                  _exploreCategory = category;
+                  _index = 1;
+                }),
           ),
           ExploreScreen(
             key: ValueKey(_exploreCategory),
             initialCategory: _exploreCategory,
           ),
+          const ActivitiesScreen(),
+          const TicketsScreen(),
           const MoreScreen(),
         ],
       ),
@@ -68,6 +72,16 @@ class _MainShellState extends State<MainShell> {
             icon: const Icon(Icons.explore_outlined),
             activeIcon: const Icon(Icons.explore_rounded),
             label: arabic ? 'استكشف' : 'Explore',
+          ),
+          BottomNavigationBarItem(
+            icon: const Icon(Icons.local_activity_outlined),
+            activeIcon: const Icon(Icons.local_activity_rounded),
+            label: arabic ? 'أنشطة' : 'Activities',
+          ),
+          BottomNavigationBarItem(
+            icon: const Icon(Icons.confirmation_number_outlined),
+            activeIcon: const Icon(Icons.confirmation_number_rounded),
+            label: arabic ? 'تذاكري' : 'Tickets',
           ),
           BottomNavigationBarItem(
             icon: const Icon(Icons.grid_view_rounded),

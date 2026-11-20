@@ -10,13 +10,13 @@ import '../../features/auth/verify_email_screen.dart';
 import '../../features/splash/splash_screen.dart';
 import '../../features/shell/main_shell.dart';
 import '../../features/place_details/place_details_screen.dart';
-import '../../features/coming_soon/coming_soon_screen.dart';
 import '../../features/ai_planner/ai_planner_screen.dart';
 import '../../features/food/food_screen.dart';
 import '../../features/ai_planner/my_plans_screen.dart';
 import '../../features/ai_planner/saved_plans_store.dart';
 import '../../features/rewards/adventure_rewards_screen.dart';
 import '../../features/journal/travel_journal_screen.dart';
+import '../../features/extra_features/feature_screens.dart';
 
 class AppRouter {
   AppRouter._();
@@ -31,10 +31,14 @@ class AppRouter {
 
       final hasSession = Supabase.instance.client.auth.currentSession != null;
       final signedOutRoutes = <String>{
-        '/login', '/signup', '/forgot-password', '/verify-email',
+        '/login',
+        '/signup',
+        '/forgot-password',
+        '/verify-email',
       };
 
-      if (authRefresh.isRecoveringPassword && hasSession &&
+      if (authRefresh.isRecoveringPassword &&
+          hasSession &&
           path != '/reset-password') {
         return '/reset-password';
       }
@@ -45,10 +49,7 @@ class AppRouter {
       return null;
     },
     routes: [
-      GoRoute(
-        path: '/',
-        builder: (context, state) => const SplashScreen(),
-      ),
+      GoRoute(path: '/', builder: (context, state) => const SplashScreen()),
       GoRoute(
         path: '/login',
         builder: (context, state) => const AuthScreen(isSignUp: false),
@@ -59,9 +60,10 @@ class AppRouter {
       ),
       GoRoute(
         path: '/verify-email',
-        builder: (context, state) => VerifyEmailScreen(
-          email: state.uri.queryParameters['email'] ?? '',
-        ),
+        builder:
+            (context, state) => VerifyEmailScreen(
+              email: state.uri.queryParameters['email'] ?? '',
+            ),
       ),
       GoRoute(
         path: '/forgot-password',
@@ -73,35 +75,33 @@ class AppRouter {
       ),
       GoRoute(
         path: '/main',
-        pageBuilder: (context, state) => CustomTransitionPage<void>(
-          key: state.pageKey,
-          child: const MainShell(),
-          transitionDuration: const Duration(milliseconds: 550),
-          transitionsBuilder: (context, animation, secondaryAnimation, child) =>
-              FadeTransition(opacity: animation, child: child),
-        ),
+        pageBuilder:
+            (context, state) => CustomTransitionPage<void>(
+              key: state.pageKey,
+              child: const MainShell(),
+              transitionDuration: const Duration(milliseconds: 550),
+              transitionsBuilder:
+                  (context, animation, secondaryAnimation, child) =>
+                      FadeTransition(opacity: animation, child: child),
+            ),
       ),
-      GoRoute(
-        path: '/home',
-        redirect: (context, state) => '/main',
-      ),
+      GoRoute(path: '/home', redirect: (context, state) => '/main'),
       GoRoute(
         path: '/place/:id',
-        builder: (context, state) => PlaceDetailsScreen(
-          placeId: state.pathParameters['id']!,
-        ),
+        builder:
+            (context, state) =>
+                PlaceDetailsScreen(placeId: state.pathParameters['id']!),
       ),
-      GoRoute(
-        path: '/food',
-        builder: (context, state) => const FoodScreen(),
-      ),
+      GoRoute(path: '/food', builder: (context, state) => const FoodScreen()),
       GoRoute(
         path: '/ai-planner',
-        builder: (context, state) => AiPlannerScreen(
-          initialPlan: state.extra is SavedPlanRecord
-              ? state.extra! as SavedPlanRecord
-              : null,
-        ),
+        builder:
+            (context, state) => AiPlannerScreen(
+              initialPlan:
+                  state.extra is SavedPlanRecord
+                      ? state.extra! as SavedPlanRecord
+                      : null,
+            ),
       ),
       GoRoute(
         path: '/my-plans',
@@ -109,8 +109,7 @@ class AppRouter {
       ),
       GoRoute(
         path: '/ar-hub',
-        builder: (context, state) =>
-            const ComingSoonScreen(feature: 'AR Reconstruction'),
+        builder: (context, state) => const ArExperienceScreen(),
       ),
       GoRoute(
         path: '/social-journal',
@@ -123,6 +122,56 @@ class AppRouter {
       GoRoute(
         path: '/profile',
         builder: (context, state) => const AccountScreen(),
+      ),
+      GoRoute(
+        path: '/activities',
+        builder: (context, state) => const ActivitiesScreen(),
+      ),
+      GoRoute(
+        path: '/activity/:id',
+        builder:
+            (context, state) =>
+                ActivityDetailsScreen(activityId: state.pathParameters['id']!),
+      ),
+      GoRoute(
+        path: '/tickets',
+        builder: (context, state) => const TicketsScreen(),
+      ),
+      GoRoute(
+        path: '/travel-groups',
+        builder: (context, state) => const TravelGroupsScreen(),
+      ),
+      GoRoute(
+        path: '/community/:id',
+        builder:
+            (context, state) =>
+                TravelGroupDetailsScreen(groupId: state.pathParameters['id']!),
+      ),
+      GoRoute(
+        path: '/group-chat/:id',
+        builder:
+            (context, state) =>
+                GroupChatScreen(groupId: state.pathParameters['id']!),
+      ),
+      GoRoute(
+        path: '/ai-group-planner',
+        builder: (context, state) => const AiGroupPlannerScreen(),
+      ),
+      GoRoute(
+        path: '/marketplace',
+        builder: (context, state) => const MarketplaceScreen(),
+      ),
+      GoRoute(
+        path: '/jordan-passport',
+        builder: (context, state) => const JordanPassportScreen(),
+      ),
+      GoRoute(
+        path: '/emergency',
+        builder: (context, state) => const EmergencySafetyScreen(),
+      ),
+      GoRoute(
+        path: '/ai-image-generator',
+        builder: (context, state) => const TimeTravelerScreen(),
       ),
     ],
   );
